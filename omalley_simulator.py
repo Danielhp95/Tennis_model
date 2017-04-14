@@ -1,4 +1,4 @@
-from omalley import omalley
+from omalley import omalleyHAHAH
 import numpy as np
 
 # Sample from a normal using mean and variance from each player for 
@@ -48,16 +48,3 @@ def is_set_over(game_score):
 
 def is_TB_game(game_score):
     return game_score[0] == 6 and game_score[1] == 6
-
-def batch_simulations(num_simulations, mean_a, mean_b,
-                      variance_a, variance_b):
-    
-    for i in range(0,num_simulations):
-        winning_probability = omalley.M3(mean_a, mean_b)
-        outcome = simulate_match(winning_probability)
-        if outcome == 1: # player A win
-            #do something
-        elif outcome == 0: # player A loss
-            #do something
-    return None
-
