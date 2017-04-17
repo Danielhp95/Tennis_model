@@ -2,7 +2,7 @@
     Make some documentation here
 """
 
-class matchLogger:
+class matchLogger(object):
 
     # serv_distribution can be fixed, gaussian
     # Match type: M3, M5
@@ -11,5 +11,14 @@ class matchLogger:
         self.serv_dist  = serv_dist
         self.match_type = match_type
         self.league     = league
+
+    def logGame(self, winner, score):
+        return 
+
+    def logSet(self, winner, score):
+        return
+
+    def logMatch(self, winner, score):
+        return 
        
 
