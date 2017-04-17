@@ -2,8 +2,11 @@ from omalley import omalley
 from dataLoggers import matchLogger as ml
 import numpy as np
 
-# Sample from a normal using mean and variance from each player for 
-# each simulation.
+"""
+ Sample from a normal using mean and variance from each player for 
+ each simulation.
+"""
+
 
 # Use fixed mean and variance from each player.
 def simulate_match(mean_a, mean_b, variance_a, variance_b):
@@ -21,15 +24,14 @@ def simulate_match(mean_a, mean_b, variance_a, variance_b):
             else:
                 p = omalley.G(serve_p_a) if player_a_serves else omalley.G(1-serve_p_b)
 
-            u = np.random.uniform(0,1)
-            game_score[0] += 1 if u <= p else 0
-            game_score[1] += 1 if u > p else 0
+            game_winner = update_game_score(p, game_score )
+            logger.logGame(game_winner, score)
 
             # Change of serve
             player_a_serves = not player_a_serves
         # Set finishes, update score 
-        winner = update_set_score(game_score, score)
-        ml.logSet(winner, game_score)
+        set_winner = update_set_score(game_score, score)
+        logger.logSet(set_winner, game_score)
     return score
 
 
@@ -49,10 +51,19 @@ def is_set_over(game_score):
 def is_TB_game(game_score):
     return game_score[0] == 6 and game_score[1] == 6
 
-def update_game_score(logger, score):
-    return
+# Might wanna add probability as a meassure
+def update_game_score(score):
+    winner = None
+    u = np.random.uniform(0,1)
+    if u <= p:
+        winner = 0
+        game_score[0] += 1
+    elif u > p:
+        winner = 1
+        game_score[1] += 1
+    return winner
 
-def update_set_score(logger, game_score, score):
+def update_set_score(game_score, score):
     winner = None
     if game_score[0] > game_score[1]:
         winner = 0
