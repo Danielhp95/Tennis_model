@@ -60,4 +60,4 @@ def update_set_score(logger, game_score, score):
     else:
         winner = 1
         score[1] += 1
-    winner
+    return winner
