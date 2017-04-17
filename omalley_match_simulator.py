@@ -1,5 +1,5 @@
 from omalley import omalley
-from dataLoggers import matchLogger
+from dataLoggers import matchLogger as ml
 import numpy as np
 
 # Sample from a normal using mean and variance from each player for 
@@ -7,7 +7,7 @@ import numpy as np
 
 # Use fixed mean and variance from each player.
 def simulate_match(mean_a, mean_b, variance_a, variance_b):
-    logger = matchLogger.matchLogger("Omalley cnst", "M3", "None")
+    logger = ml.matchLogger("Omalley cnst", "M3", "None")
     score = [0,0] # Player's score
     player_a_serves = True
     while not is_match_over(score):
@@ -28,10 +28,8 @@ def simulate_match(mean_a, mean_b, variance_a, variance_b):
             # Change of serve
             player_a_serves = not player_a_serves
         # Set finishes, update score 
-        if game_score[0] > game_score[1]:
-            score[0] += 1
-        else:
-            score[1] += 1
+        winner = update_set_score(game_score, score)
+        ml.logSet(winner, game_score)
     return score
 
 
@@ -51,4 +49,15 @@ def is_set_over(game_score):
 def is_TB_game(game_score):
     return game_score[0] == 6 and game_score[1] == 6
 
-print("hello")
+def update_game_score(logger, score):
+    return
+
+def update_set_score(logger, game_score, score):
+    winner = None
+    if game_score[0] > game_score[1]:
+        winner = 0
+        score[0] += 1
+    else:
+        winner = 1
+        score[1] += 1
+    winner
