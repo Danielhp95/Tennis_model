@@ -20,5 +20,3 @@ class matchLogger(object):
 
     def logMatch(self, winner, score):
         return 
-       
-
