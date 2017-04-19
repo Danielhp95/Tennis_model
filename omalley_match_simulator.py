@@ -16,8 +16,6 @@ class MatchSimulator(object):
 
     """
     def __init__(self, game_f=omalley.G, tie_break_f=omalley.TB):
-        print("ye")
-        self.caca = "caca"
         self.game_f      = game_f
         self.tie_break_f = tie_break_f
 
