@@ -1,8 +1,6 @@
 from pandas import read_csv
 import pandas as pd
 
-
-
 DATA_DIR = r'/home/dh1213/tennis_model/data/tennis_atp/'
 MATCHES = 'atp_matches_'
 
@@ -10,7 +8,7 @@ MATCHES = 'atp_matches_'
 # Return type is a set
 def common_opponents(player_a, player_b):
     loc        = DATA_DIR + MATCHES + '2016.csv'
-    match_info = pd.read_csv(loc)
+    match_info = pd.read_csv(loc, encoding="utf-8-sig")
 
     player_a_opponents = find_opponents_for_player(player_a, match_info)
     player_b_opponents = find_opponents_for_player(player_b, match_info)
@@ -19,15 +17,12 @@ def common_opponents(player_a, player_b):
     # to avoid cases in which players have faced each other. TODO: ask Will about this
     com_opponents = (player_a_opponents & player_b_opponents) - set([player_a, player_b])
 
-    return com_opponents
     # TODO: ponder whether this can be improved
-    
-    #com_opponents_info = match_info[((match_info.winner_name == player_a) & (match_info.loser_name in common_opponents))]
-
-           #                        ((match_info.loser_name == player_a) & (match_info.winner_name in common_opponents)) |
-           #                        ((match_info.winner_name == player_b) & (match_info.loser_name in common_opponents)) |
-           #                        ((match_info.loser_name == player_b) & (match_info.winner_name in common_opponents))]
-    print(com_opponents_info)
+    com_opponents_info = match_info[((match_info.winner_name == player_a) & (match_info.loser_name.isin(com_opponents))) |
+                                    ((match_info.loser_name == player_a) & (match_info.winner_name.isin(com_opponents))) |
+                                    ((match_info.winner_name == player_b) & (match_info.loser_name.isin(com_opponents))) |
+                                    ((match_info.loser_name == player_b) & (match_info.winner_name.isin(com_opponents)))]
+    return com_opponents, com_opponents_info
 
 
 
@@ -44,5 +39,3 @@ def common_opponent_print_filter(data_frame):
     return data_frame.filter(items=['winner_name','loser_name',
                                      'w_svpt', 'w_1stWon', 'w_2ndWon',
                                      'l_svpt', 'l_1stWon', 'l_2ndWon'])
-
-print(common_opponents('Roger Federer', 'Milos Raonic'))

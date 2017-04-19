@@ -1,7 +1,13 @@
+from __future__ import division
+
 import os, sys
 omalley_path = os.path.abspath(os.path.join('..', 'omalley'))
 sys.path.append(omalley_path)
 import omalley
+tennis_atp_dao_path = os.path.abspath(os.path.join('..', 'data','dao'))
+sys.path.append(tennis_atp_dao_path)
+import tennisAtpDao as dao
+
 
 """
   Common opponent model
@@ -9,26 +15,48 @@ import omalley
 """
 class CommonOpponnent(object):
 
-    def __init__(self, model_function=omalley.M3, best_of=3, dao=None):
+    def __init__(self, model_function=omalley.M3, best_of=3):
         self.model_function = model_function if best_of == 3 else omalley.M5
-        self.dao = dao
         self.average_player_performance = 0.6
+        self.com_ops = None
 
-        #TODO: implement common opponent calculation.
 
     #TODO: implement once I have point by point data
-    def service_win_probability(self, player_A, player_B):
-        return 0
+    def service_win_probability(self, player_a, player_b):
+        print(player_a)
+        print(player_b)
+        f_opponents = self.com_ops[((self.com_ops.winner_name == player_a) & (self.com_ops.loser_name == player_b)) |
+                                   ((self.com_ops.winner_name == player_b) & (self.com_ops.loser_name == player_a))]
 
-    def advantage_via_com_opp(self, player_A, player_B, com_opp):
-        spw_a = self.service_win_probability(player_A, com_opp)
-        spw_b = self.service_win_probability(player_B, com_opp)
-        rpw_a = 1 - service_win_probability(com_opp, player_A)
-        rpw_b = 1 - service_win_probability(com_opp, player_B)
+        swp = -1
+        print(dao.common_opponent_print_filter(f_opponents))
+        if len(f_opponents) >= 1: # Do average over all cases
+            print('more than one')
+            swp = sum([self.single_swp(player_a, f_opponents, index) for index, row in f_opponents.iterrows()]) / len(f_opponents)
+        elif len(f_opponents) == 1: # Normal case
+            swp = self.single_swp(player_a, f_opponents, 0)
+        else: #Should never get here
+            print("Error no common opponents")
+        assert(swp > 0)
+        return swp
+
+    def single_swp(self, player_a, df, i):
+        print(df.winner_name[i])
+        if df.winner_name[i] == player_a:
+            return (df.w_1stWon[i] + df.w_2ndWon[i]) / df.w_svpt[i]
+        else:
+            return (df.l_1stWon[i] + df.l_2ndWon[i]) / df.l_svpt[i]
+
+
+    def advantage_via_com_opp(self, player_a, player_b, com_opp):
+        spw_a = self.service_win_probability(player_a, com_opp)
+        spw_b = self.service_win_probability(player_b, com_opp)
+        rpw_a = 1 - self.service_win_probability(com_opp, player_a)
+        rpw_b = 1 - self.service_win_probability(com_opp, player_b)
         return (spw_a - rpw_a) - (spw_b - rpw_b)
 
-    def prob_beating_through_com_opp(self, player_A, player_B, comm_opp):
-        delta_a_b_c = self.advantage_via_com_opp(player_A, player_B, com_opp)
+    def prob_beating_through_com_opp(self, player_a, player_b, com_opp):
+        delta_a_b_c = self.advantage_via_com_opp(player_a, player_b, com_opp)
 
         pos_effect = self.average_player_performance + delta_a_b_c
         effect_on_player_a = self.model_function(pos_effect, 1-0.6)
@@ -38,8 +66,14 @@ class CommonOpponnent(object):
 
         return 0.5 * (effect_on_player_a - effect_on_player_b)
 
-    def prob_a_beating_b(self, player_a, player_b, com_opps):
+    def prob_a_beating_b(self, player_a, player_b):
+        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b)
+
         probs = [self.prob_beating_through_com_opp(player_a, player_b, op)
-                 for op in com_opps]
-        return sum(probs) / len(probs)  
+                 for op in com_ops_set]
+        return sum(probs) / len(com_ops_set)  
+
+com = CommonOpponnent()
+p = com.prob_a_beating_b('Roger Federer', 'Nikoloz Basilashvili')
+print(p)
 
