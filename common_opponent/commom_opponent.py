@@ -9,10 +9,12 @@ import omalley
 """
 class CommonOpponnent(object):
 
-    def __init__(self, model_function=omalley.M3, dao=None):
-        self.model_function = model_function
+    def __init__(self, model_function=omalley.M3, best_of=3, dao=None):
+        self.model_function = model_function if best_of == 3 else omalley.M5
         self.dao = dao
         self.average_player_performance = 0.6
+
+        #TODO: implement common opponent calculation.
 
     #TODO: implement once I have point by point data
     def service_win_probability(self, player_A, player_B):
