@@ -3,12 +3,10 @@ import pandas as pd
 
 DATA_DIR = r'/home/dh1213/tennis_model/data/tennis_atp/'
 MATCHES = 'atp_matches_'
+CURRENT_YEAR = 2017 # Change once a year!
 
-# TODO: figure out how to parameterize how many years will be taken into account
-# Return type is a set
-def common_opponents(player_a, player_b):
-    loc        = DATA_DIR + MATCHES + '2016.csv'
-    match_info = pd.read_csv(loc, encoding="utf-8-sig")
+def common_opponents(player_a, player_b, from_year=CURRENT_YEAR):
+    match_info = concatenate_match_info_since(from_year)
 
     player_a_opponents = find_opponents_for_player(player_a, match_info)
     player_b_opponents = find_opponents_for_player(player_b, match_info)
@@ -24,7 +22,12 @@ def common_opponents(player_a, player_b):
                                     ((match_info.loser_name == player_b) & (match_info.winner_name.isin(com_opponents)))]
     return com_opponents, com_opponents_info
 
-
+def concatenate_match_info_since(from_year):
+    all_frames = map(lambda x: pd.read_csv(x), [DATA_DIR + MATCHES + str(year) + '.csv' for year in range(CURRENT_YEAR, from_year -1, -1)])
+    years = [str(year) for year in range(CURRENT_YEAR, from_year -1, -1)]
+    print(years)
+    return pd.concat(all_frames, keys=years)
+        
 
 '''
  Finds all matches in which PLAYER has participated.
