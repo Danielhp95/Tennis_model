@@ -19,12 +19,13 @@ class CommonOpponnent(object):
         self.model_function = model_function if best_of == 3 else omalley.M5
         self.average_player_performance = 0.6
         self.com_ops = None
+        self.MIN_OPP_THRESHOLD = 4
 
 
     def service_win_probability(self, player_a, player_b):
         f_opponents = self.com_ops[((self.com_ops.winner_name == player_a) & (self.com_ops.loser_name == player_b)) |
                                    ((self.com_ops.winner_name == player_b) & (self.com_ops.loser_name == player_a))]
-
+        
         swp = -1
         if len(f_opponents) >= 1: # Do average over all cases
             swp = sum([self.single_swp(player_a, f_opponents, index) for index, row in f_opponents.iterrows()]) / len(f_opponents)
@@ -32,8 +33,9 @@ class CommonOpponnent(object):
             swp = self.single_swp(player_a, f_opponents, 0)
         else: #Should never get here
             print("Error no common opponents")
-        print(swp)
+
         assert(swp >= 0)
+
         return swp
 
     def single_swp(self, player_a, df, i):
@@ -64,14 +66,17 @@ class CommonOpponnent(object):
     def prob_a_beating_b(self, player_a, player_b, since):
         com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b, since)
 
-        if len(com_ops_set) == 0:
-            print("No common opponents")
+        print("Common opponents: " + str(len(com_ops_set)))
+        if len(com_ops_set) < self.MIN_OPP_THRESHOLD:
+            print("Minimum amount of common opponents " + 
+                   str(self.MIN_OPP_THRESHOLD) + " given " + 
+                   str(len(com_ops_set)))
             return -1
         probs = [self.prob_beating_through_com_opp(player_a, player_b, op)
                  for op in com_ops_set]
         return sum(probs) / len(com_ops_set)  
 
 com = CommonOpponnent()
-p = com.prob_a_beating_b('Roger Federer', 'Nikoloz Basilashvili',2013)
+p = com.prob_a_beating_b('Nikoloz Basilashvili', 'Roger Federer' ,2015)
 print(p)
 

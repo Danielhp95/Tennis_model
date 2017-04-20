@@ -8,6 +8,7 @@ CURRENT_YEAR = 2017 # Change once a year!
 def common_opponents(player_a, player_b, from_year=CURRENT_YEAR):
     match_info = concatenate_match_info_since(from_year)
 
+    # Opponents are filtered to remove rows with NaN values in serve related areas
     player_a_opponents = find_opponents_for_player(player_a, match_info)
     player_b_opponents = find_opponents_for_player(player_b, match_info)
 
@@ -15,11 +16,21 @@ def common_opponents(player_a, player_b, from_year=CURRENT_YEAR):
     # to avoid cases in which players have faced each other. TODO: ask Will about this
     com_opponents = (player_a_opponents & player_b_opponents) - set([player_a, player_b])
 
-    # TODO: ponder whether this can be improved
+
+    # Find common opponents
     com_opponents_info = match_info[((match_info.winner_name == player_a) & (match_info.loser_name.isin(com_opponents))) |
                                     ((match_info.loser_name == player_a) & (match_info.winner_name.isin(com_opponents))) |
                                     ((match_info.winner_name == player_b) & (match_info.loser_name.isin(com_opponents))) |
                                     ((match_info.loser_name == player_b) & (match_info.winner_name.isin(com_opponents)))]
+
+    # Second NaN filtering
+    com_opponents_info = com_opponents_info[(pd.notnull(com_opponents_info.w_1stWon)) &
+                          (pd.notnull(com_opponents_info.w_2ndWon)) &
+                          (pd.notnull(com_opponents_info.w_svpt)) &
+                          (pd.notnull(com_opponents_info.l_1stWon)) &
+                          (pd.notnull(com_opponents_info.l_2ndWon)) &
+                          (pd.notnull(com_opponents_info.l_svpt))]
+
     return com_opponents, com_opponents_info
 
 def concatenate_match_info_since(from_year):
@@ -36,6 +47,14 @@ def concatenate_match_info_since(from_year):
 def find_opponents_for_player(player, match_info):
     opponents = match_info[(match_info.winner_name == player) |
                              (match_info.loser_name == player)]
+
+    opponents = opponents[(pd.notnull(match_info.w_1stWon)) &
+                          (pd.notnull(match_info.w_2ndWon)) &
+                          (pd.notnull(match_info.w_svpt)) &
+                          (pd.notnull(match_info.l_1stWon)) &
+                          (pd.notnull(match_info.l_2ndWon)) &
+                          (pd.notnull(match_info.l_svpt))]
+
     return (set(opponents.winner_name) | set(opponents.loser_name)) - set(player)
 
 def common_opponent_print_filter(data_frame):
