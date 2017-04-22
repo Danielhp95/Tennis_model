@@ -5,8 +5,8 @@ DATA_DIR = r'/home/dh1213/tennis_model/data/tennis_atp/'
 MATCHES = 'atp_matches_'
 CURRENT_YEAR = 2017 # Change once a year!
 
-def common_opponents(player_a, player_b, from_year=CURRENT_YEAR):
-    match_info = concatenate_match_info_since(from_year)
+def common_opponents(player_a, player_b, initial_year=CURRENT_YEAR, final_year=CURRENT_YEAR):
+    match_info = concatenate_match_info_since(DATA_DIR + MATCHES, initial_year, final_year)
 
     # Opponents are filtered to remove rows with NaN values in serve related areas
     player_a_opponents = find_opponents_for_player(player_a, match_info)
@@ -33,16 +33,20 @@ def common_opponents(player_a, player_b, from_year=CURRENT_YEAR):
 
     return com_opponents, com_opponents_info
 
-def concatenate_match_info_since(from_year):
-    all_frames = map(lambda x: pd.read_csv(x), [DATA_DIR + MATCHES + str(year) + '.csv' for year in range(CURRENT_YEAR, from_year -1, -1)])
-    years = [str(year) for year in range(CURRENT_YEAR, from_year -1, -1)]
-    print(years)
+'''
+    Years decrement in loops because most recent data is the most valuable
+    for any model.
+'''
+def concatenate_match_info_since(directory, initial_year, final_year):
+    all_frames = map(lambda x: pd.read_csv(x), [directory + str(year) + '.csv' for year in range(final_year, initial_year -1, -1)])
+    years = [str(year) for year in range(final_year, initial_year -1, -1)]
     return pd.concat(all_frames, keys=years)
         
 
 '''
- Finds all matches in which PLAYER has participated.
- Creates a set containing all of those players, and removes the player himself from it
+    Finds all matches in which PLAYER has participated.
+    Creates a set containing all of those players, and 
+    removes the player himself from the data frame:
 '''
 def find_opponents_for_player(player, match_info):
     opponents = match_info[(match_info.winner_name == player) |
@@ -57,6 +61,9 @@ def find_opponents_for_player(player, match_info):
 
     return (set(opponents.winner_name) | set(opponents.loser_name)) - set(player)
 
+'''
+    For debugging purposes
+'''
 def common_opponent_print_filter(data_frame):
     return data_frame.filter(items=['winner_name','loser_name',
                                      'w_svpt', 'w_1stWon', 'w_2ndWon',

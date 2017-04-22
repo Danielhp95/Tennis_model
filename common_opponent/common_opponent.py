@@ -13,7 +13,7 @@ import tennisAtpDao as dao
   Common opponent model
   Authors: William J. Knottenbelt, Demitris Spanias & Agnieszka M. Madurska
 """
-class CommonOpponnent(object):
+class CommonOpponent(object):
 
     def __init__(self, model_function=omalley.M3, best_of=3):
         self.model_function = model_function if best_of == 3 else omalley.M5
@@ -22,21 +22,21 @@ class CommonOpponnent(object):
         self.MIN_OPP_THRESHOLD = 4
 
 
-    def service_win_probability(self, player_a, player_b):
+    def win_probability(self, player_a, player_b, prob_type):
         f_opponents = self.com_ops[((self.com_ops.winner_name == player_a) & (self.com_ops.loser_name == player_b)) |
                                    ((self.com_ops.winner_name == player_b) & (self.com_ops.loser_name == player_a))]
         
-        swp = -1
+        wp = -1
         if len(f_opponents) >= 1: # Do average over all cases
-            swp = sum([self.single_swp(player_a, f_opponents, index) for index, row in f_opponents.iterrows()]) / len(f_opponents)
+            wp = self.multiple_match_swp(player_a, f_opponents) if prob_type == "swp" else self.multiple_match_rwp(player_a, f_opponents)
         elif len(f_opponents) == 1: # Normal case
-            swp = self.single_swp(player_a, f_opponents, 0)
-        else: #Should never get here
-            print("Error no common opponents")
+            wp = self.single_swp(player_a, f_opponents, 0) if prob_type == "swp" else self.single_rwp(player_a, f_opponents, 0)
+        #else: #Should never get here
+         #   print("Error no common opponents")
 
-        assert(swp >= 0)
+        #assert(swp >= 0)
 
-        return swp
+        return wp
 
     def single_swp(self, player_a, df, i):
         if df.winner_name[i] == player_a:
@@ -44,13 +44,26 @@ class CommonOpponnent(object):
         else:
             return (df.l_1stWon[i] + df.l_2ndWon[i]) / df.l_svpt[i]
 
+    def multiple_match_swp(self, player_a, df):
+        return sum([self.single_swp(player_a, df, i) 
+                    for i, _ in df.iterrows()]) / len(df)
+
+    def single_rwp(self, player_a, df, i):
+        if df.winner_name[i] == player_a:
+            return 1 - ((df.l_1stWon[i] + df.l_2ndWon[i]) / df.l_svpt[i])
+        else:
+            return 1 - ((df.w_1stWon[i] + df.w_2ndWon[i]) / df.w_svpt[i])
+
+    def multiple_match_rwp(self, player_a, df):
+        return sum([self.single_rwp(player_a, df, i) 
+                    for i, _ in df.iterrows()]) / len(df)
 
     def advantage_via_com_opp(self, player_a, player_b, com_opp):
-        spw_a = self.service_win_probability(player_a, com_opp)
-        spw_b = self.service_win_probability(player_b, com_opp)
-        rpw_a = 1 - self.service_win_probability(com_opp, player_a)
-        rpw_b = 1 - self.service_win_probability(com_opp, player_b)
-        return (spw_a - rpw_a) - (spw_b - rpw_b)
+        spw_a = self.win_probability(player_a, com_opp, "swp")
+        spw_b = self.win_probability(player_b, com_opp, "swp")
+        rpw_a = self.win_probability(player_a, com_opp, "rwp") #?
+        rpw_b = self.win_probability(player_b, com_opp, "rwp") #?
+        return (spw_a - (1 - rpw_a)) - (spw_b - (1 - rpw_b))
 
     def prob_beating_through_com_opp(self, player_a, player_b, com_opp):
         delta_a_b_c = self.advantage_via_com_opp(player_a, player_b, com_opp)
@@ -76,7 +89,8 @@ class CommonOpponnent(object):
                  for op in com_ops_set]
         return sum(probs) / len(com_ops_set)  
 
-com = CommonOpponnent()
-p = com.prob_a_beating_b('Nikoloz Basilashvili', 'Roger Federer' ,2015)
-print(p)
+if __name__ == '__main__':
+    com = CommonOpponent()
+    p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili', 2015)
+    print(p)
 
