@@ -12,9 +12,6 @@ class tennis_atp_dao_test(unittest.TestCase):
     def setUpClass(self):
         return 
 
-    def test_fail(self):
-        assert(False)
-
     def test_can_concatenate_multiple_files(self):
         directory = r'test_data/single_match'
         initial_year = 1
