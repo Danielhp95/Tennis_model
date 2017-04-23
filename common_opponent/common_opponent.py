@@ -20,8 +20,8 @@ class CommonOpponent(object):
         self.average_player_performance = 0.6
         self.com_ops = None
         self.MIN_OPP_THRESHOLD = 4
-        self.initial_year = 2017 # change once a year
-        self.final_year   = 2017
+        self.latest_year      = 2017 # change once a year
+        self.earliest=_year   = 2017
         self.courts = ["Hard", "Clay", "Grass", "Carpet"] #TODO Ask Wil if there are more courts
 
     def check_min_opponent_threshold(self, com_ops_set):
@@ -74,7 +74,7 @@ class CommonOpponent(object):
 
     def prob_beating_through_com_opp(self, player_a, player_b, com_opp):
         delta_a_b_c = self.advantage_via_com_opp(player_a, player_b, com_opp)
-        
+        print((delta_a_b_c, com_opp))
         pos_effect = self.average_player_performance + delta_a_b_c
         effect_on_player_a = self.model_function(pos_effect, 1-0.6)
 
@@ -84,19 +84,26 @@ class CommonOpponent(object):
         return 0.5 * (effect_on_player_a + effect_on_player_b)
 
     def prob_a_beating_b(self, player_a, player_b):
-        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b, self.initial_year, self.final_year, self.courts)
+        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b,
+                                                         latest_year=self.latest_year,
+                                                         earliest_year=self.earliest_year, 
+                                                         courts=self.courts)
 
         if self.check_min_opponent_threshold(com_ops_set) == -1:
             return -1
 
         probabilities = [self.prob_beating_through_com_opp(player_a, player_b, op)
                  for op in com_ops_set]
+        print(zip(probabilities, com_ops_set))
         normalized_probability = sum(probabilities) / len(com_ops_set)
         return normalized_probability
 
 if __name__ == '__main__':
     com = CommonOpponent()
+    com.courts        = ["Hard", "Clay"]
+    com.earliest_year = 2014
+    com.latest_year   = 2017
 
-    p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili', 2014)
+    p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili')
     print(p)
 
