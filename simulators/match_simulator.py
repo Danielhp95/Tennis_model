@@ -1,3 +1,6 @@
+import os, sys
+project_path = os.path.abspath(os.path.join('..'))
+sys.path.append(project_path)
 from omalley import omalley
 from dataLoggers import matchLogger as ml
 import numpy as np
