@@ -20,7 +20,18 @@ class CommonOpponent(object):
         self.average_player_performance = 0.6
         self.com_ops = None
         self.MIN_OPP_THRESHOLD = 4
+        self.initial_year = 2017 # change once a year
+        self.final_year   = 2017
+        self.courts = ["Hard", "Clay", "Grass", "Carpet"] #TODO Ask Wil if there are more courts
 
+    def check_min_opponent_threshold(self, com_ops_set):
+        print("Common opponents: " + str(len(com_ops_set)))
+        if len(com_ops_set) < self.MIN_OPP_THRESHOLD:
+            print("Minimum amount of common opponents " + 
+                   str(self.MIN_OPP_THRESHOLD) + " given " + 
+                   str(len(com_ops_set)))
+            return -1
+        return 0
 
     def win_probability(self, player_a, player_b, prob_type):
         f_opponents = self.com_ops[((self.com_ops.winner_name == player_a) & (self.com_ops.loser_name == player_b)) |
@@ -31,10 +42,6 @@ class CommonOpponent(object):
             wp = self.multiple_match_swp(player_a, f_opponents) if prob_type == "swp" else self.multiple_match_rwp(player_a, f_opponents)
         elif len(f_opponents) == 1: # Normal case
             wp = self.single_swp(player_a, f_opponents, 0) if prob_type == "swp" else self.single_rwp(player_a, f_opponents, 0)
-        #else: #Should never get here
-         #   print("Error no common opponents")
-
-        #assert(swp >= 0)
 
         return wp
 
@@ -76,21 +83,20 @@ class CommonOpponent(object):
 
         return 0.5 * (effect_on_player_a + effect_on_player_b)
 
-    def prob_a_beating_b(self, player_a, player_b, since):
-        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b, since)
+    def prob_a_beating_b(self, player_a, player_b):
+        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b, self.initial_year, self.final_year, self.courts)
 
-        print("Common opponents: " + str(len(com_ops_set)))
-        if len(com_ops_set) < self.MIN_OPP_THRESHOLD:
-            print("Minimum amount of common opponents " + 
-                   str(self.MIN_OPP_THRESHOLD) + " given " + 
-                   str(len(com_ops_set)))
+        if self.check_min_opponent_threshold(com_ops_set) == -1:
             return -1
-        probs = [self.prob_beating_through_com_opp(player_a, player_b, op)
+
+        probabilities = [self.prob_beating_through_com_opp(player_a, player_b, op)
                  for op in com_ops_set]
-        return sum(probs) / len(com_ops_set)  
+        normalized_probability = sum(probabilities) / len(com_ops_set)
+        return normalized_probability
 
 if __name__ == '__main__':
     com = CommonOpponent()
-    p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili', 2015)
+
+    p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili', 2014)
     print(p)
 

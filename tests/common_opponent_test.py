@@ -86,9 +86,6 @@ class common_opponent_test(unittest.TestCase):
         real_rpw = 1 - ((25 + 14) /57)
         assert(real_rpw == rpw)
 
-    def test_caca(self):
-        assert(True)
-
     def calculate_rwp_from_loc_player(self, loc, player):
         location = r'test_data/' + loc
         df = pd.read_csv(location, skipinitialspace=True)
