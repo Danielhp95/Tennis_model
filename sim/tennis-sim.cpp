@@ -47,7 +47,7 @@
 #include <algorithm>
 #include <string>
 
-#define TRIALS 50
+#define TRIALS 1
 
 using namespace std;
 
@@ -111,6 +111,13 @@ int main(int argc, char *argv[]) {
   long matches_over = 0, matches_under = 0;
   double total_games = 0;
 
+  double total_serves[2];
+  total_serves[0] = 0;
+  total_serves[1] = 0;
+  double total_serves_won[2];
+  total_serves_won[0] = 0;
+  total_serves_won[1] = 0;
+
   std::vector<int> game_lengths;
   for (int n=0; n<TRIALS; n++) {
     if (n % 1000 == 0){
@@ -148,11 +155,21 @@ int main(int argc, char *argv[]) {
     assert(sets_p1 >= 0 && sets_p1 <= (five_sets ? 3 : 2) );
     assert(sets_p2 >= 0 && sets_p2 <= (five_sets ? 3 : 2) );
     outcomes[sets_p1][sets_p2]++;
+
+    total_serves[0] += m.serves_played(0);
+    total_serves[1] += m.serves_played(1);
+    total_serves_won[0] += m.serves_won(0);
+    total_serves_won[1] += m.serves_won(1);
   }
 
   sort(game_lengths.begin(), game_lengths.end());
   cout << TRIALS << " matches simulated."  << endl << endl;
-  
+
+  for (int p=0; p<2; p++) {
+    cout << "Player " << p + 1 << " served this many times: " << (double) total_serves[p] << endl;
+    cout << "Player " << p + 1 << " serve win probability: " << (double) total_serves_won[p]/total_serves[p] << endl;
+  }  
+  cout << endl;
   for (int p=0; p<2; p++) 
     cout << "Player " << p + 1 << " wins match with probability " << (double) winner[p]/TRIALS << " (fair odds " << (double) TRIALS/winner[p] << ")" << endl;
   cout << endl;

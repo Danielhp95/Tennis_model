@@ -21,7 +21,7 @@ public:
     reset_game();
   }
 
-  #define QUICK
+ // #define QUICK UNCOMMENT FOR QUICK SIMULATIONS
 
   bool play_game() {
   
@@ -34,7 +34,7 @@ public:
    //http://robert-farrenkopf.info/tennis/tennis1.htm
    if (!tiebreak) {
       int server = !match->player1_serving();
-  //    cout << "QUICK server = " << server << " ";
+      cout << "Running in quick mode, using omalley equations" << endl;
       int receiver = !server;
       //double in_p = (player(server)->first_serve_in_percent()+match->noise(server))/100.0;
       //     double p = in_p*player(server)->first_service_points_won_percent_against_player(*player(receiver))/100.0 + (1.0-in_p)*player(server)->second_service_points_won_percent_against_player(*player(receiver))/100.0;
@@ -45,6 +45,7 @@ public:
       double randperc = drand48();       
       double server_wins = (randperc < game_p) ? true : false;
       result = (match->player1_serving()) ? server_wins : !server_wins;
+      cout << "Running in quick mode, using omalley equations" << endl;
       match->switch_server();
       return result;
    } 
@@ -59,22 +60,24 @@ public:
 
     bool player1_serving_start = match->player1_serving();
 
-
+    int serves = 0;
     while (!game_over(target)) {
-
+      serves++;
       int server = !match->player1_serving();
       int receiver = !server;
 #ifdef VERBOSE
       cout << "server is " << server << " receiver is " << receiver << endl;
 #endif
-      double randperc = drand48()*100.0;
 
+      double randperc = drand48(); // THIS was before multiplied by 100
       result = (randperc < _spw[server]) ? true : false;
-
+      
+      match->increase_serves_played(server);
       if (result) {
-	points_won[server]++;
+	    points_won[server]++;
+        match->increase_serves_won(server);
       } else {
-	points_won[receiver]++;    	
+        points_won[receiver]++;    	
       }
 
 #ifdef VERBOSE
@@ -88,7 +91,7 @@ public:
       }
 
     }
-    
+    cout << "Serves in game " << serves << endl;
     if (match->player1_serving() == player1_serving_start)
       match->switch_server();
    

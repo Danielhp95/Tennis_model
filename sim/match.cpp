@@ -22,8 +22,8 @@ Match::Match(double spw1, double stddev1, double spw2, double stddev2, bool five
   _noise[0] = z1.next();
   _noise[1] = z2.next();
 
-//  cout << "noise[0] = " << _noise[0] << endl;
- // cout << "noise[1] = " << _noise[1] << endl;
+//cout << "noise[0] = " << _noise[0] << endl;
+//cout << "noise[1] = " << _noise[1] << endl;
 
   _sets_to_win = (five_sets) ? 3 : 2;
   _tiebreaker_final_set = tiebreaker_final_set;
@@ -40,9 +40,13 @@ bool Match::play_match() {
       noisy_spw[x] = 0;
     if (noisy_spw[x] > 100)
       noisy_spw[x] = 100;
-    noisy_spw[x] /= 100.0;
+  //  noisy_spw[x] /= 100.0; TODO: think this through
+  //  Input probabilities are already between 0-1.
+  //  It makes no sense to divide by 100 then.
   }
-    
+  cout << "These are spw sent " << endl; 
+  cout << "Player a: " << noisy_spw[0] << endl; 
+  cout << "Player b: " << noisy_spw[1] << endl; 
   while (!match_over()) {
    
     bool final_set = (_sets_won[0] == _sets_to_win - 1) && (_sets_won[1] == _sets_to_win - 1);	

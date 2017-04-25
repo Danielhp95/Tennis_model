@@ -23,6 +23,8 @@ bool Set::play_set (double *spw) {
     }
     Game *current = new Game (match, tiebreak, spw);
     current->play_game();
+    //cout << "SPW for the game: " << *spw << endl;
+    //cout << "Game won by player_a " << current->player_won(0) << endl;
     if (current->player_won(0)) {
       games_won[0]++;
 #ifdef VERBOSE

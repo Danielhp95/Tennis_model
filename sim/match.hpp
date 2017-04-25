@@ -14,7 +14,7 @@ private:
   bool _tiebreaker;
   bool _tiebreaker_final_set;
   int _total_games;
-  int _serves[2]
+  int _serves_played[2];
   int _serves_won[2];
 
   void reset_match() {
@@ -22,10 +22,12 @@ private:
     _total_games = 0;
     _sets_won[0] = 0;
     _sets_won[1] = 0;
-    _serves[0] = 0;
-    _serves[1] = 0;
+
+    _serves_played[0] = 0;
+    _serves_played[1] = 0;
     _serves_won[0] = 0;
     _serves_won[1] = 0;
+
     _player1_serving = (drand48() > 0.5);
     _tiebreaker = false;
   }
@@ -68,9 +70,11 @@ public:
   int sets_to_win() const { return _sets_to_win; }
 
   int sets_won(int player) { return _sets_won[player]; }
-
   
-  void increase_serves(int player) { return _serves_won
+  void increase_serves_played(int player) { _serves_played[player]++; }
+  int serves_played(int player) { return _serves_played[player]; }
+
+  void increase_serves_won(int player) { _serves_won[player]++; }
   int serves_won(int player) { return _serves_won[player]; }
 
   bool tiebreaker() const { return _tiebreaker; }
