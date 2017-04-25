@@ -1,5 +1,6 @@
 *.pyc
 *.so
 *.o
-*.swp
+*.sw*
 .currentcommit
+NOTES.txt
