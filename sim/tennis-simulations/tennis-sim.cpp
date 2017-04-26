@@ -38,7 +38,7 @@
 
 using namespace std;
 
-#define TRIALS 1
+#define TRIALS 2
 
 
 int main(int argc, char *argv[]) {
@@ -82,6 +82,8 @@ int main(int argc, char *argv[]) {
   int set_limit = (five_sets ? 3 : 2);
 
   srand48(time(NULL));
+
+  //Better document these.
   int winner[2], outcomes[4][4], wins_set[2], wins_straight_sets[2];
   int tiebreak_matches = 0;
  
@@ -96,12 +98,11 @@ int main(int argc, char *argv[]) {
   long matches_over = 0, matches_under = 0;
   double total_games = 0;
 
-  int total_serves[2];
-  total_serves[0] = 0;
-  total_serves[1] = 0;
-  int total_serves_won[2];
-  total_serves_won[0] = 0;
-  total_serves_won[1] = 0;
+  // Variables used to calculate spw 
+  int total_serves[2]     = {0,0};
+  int total_serves_won[2] = {0,0};
+  std::vector<double> a_matches_spw;
+  std::vector<double> b_matches_spw;
 
   std::vector<int> game_lengths;
   for (int n=0; n<TRIALS; n++) {
@@ -145,11 +146,26 @@ int main(int argc, char *argv[]) {
     total_serves[1] += m.serves_played(1);
     total_serves_won[0] += m.serves_won(0);
     total_serves_won[1] += m.serves_won(1);
+    a_matches_spw.push_back((double)m.serves_won(0)/m.serves_played(0));
+    b_matches_spw.push_back((double)m.serves_won(1)/m.serves_played(1));
   }
 
+  // Sorting simulated data
   sort(game_lengths.begin(), game_lengths.end());
-  cout << TRIALS << " matches simulated."  << endl << endl;
+  sort(a_matches_spw.begin(), a_matches_spw.end());
+  sort(b_matches_spw.begin(), b_matches_spw.end());
 
+  for (auto i : a_matches_spw) {
+      cout << i << ' ';
+  }
+  cout << endl;
+  for (auto i : b_matches_spw) {
+      cout << i << ' ';
+  }
+  cout << endl;
+  
+  cout << TRIALS << " matches simulated."  << endl << endl;
+  return 0;
   for (int p=0; p<2; p++) {
     cout << "Player " << p + 1 << " served this many times: " << (double) total_serves[p] << endl;
     cout << "Player " << p + 1 << " serve win probability: " << spw(p, total_serves, total_serves_won) << endl;
@@ -195,8 +211,7 @@ double average_game_length(int total_games, int num_matches) {
 
 double median_game_length(std::vector<int> game_lengths, int num_matches) {
     if (num_matches % 2 == 0) {
-        return (double) game_lengths[num_matches/2] + game_lengths[(num_matches/2) - 1]/2;
-    } else {
-        return game_lengths[num_matches / 2];
-    }
+        return (double) (game_lengths[num_matches/2] +
+                         game_lengths[(num_matches/2) - 1])/2;
+    } else { return game_lengths[num_matches / 2]; }
 }

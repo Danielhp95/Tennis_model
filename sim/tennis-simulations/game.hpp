@@ -93,7 +93,11 @@ public:
       }
 
     }
+
+#ifdef VERBOSE
     cout << "Serves in game " << serves << endl;
+#endif
+
     if (match->player1_serving() == player1_serving_start)
       match->switch_server();
    

@@ -44,9 +44,6 @@ bool Match::play_match() {
   //  Input probabilities are already between 0-1.
   //  It makes no sense to divide by 100 then.
   }
-  cout << "These are spw sent " << endl; 
-  cout << "Player a: " << noisy_spw[0] << endl; 
-  cout << "Player b: " << noisy_spw[1] << endl; 
   while (!match_over()) {
    
     bool final_set = (_sets_won[0] == _sets_to_win - 1) && (_sets_won[1] == _sets_to_win - 1);	
