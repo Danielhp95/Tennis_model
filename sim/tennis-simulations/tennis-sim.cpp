@@ -48,6 +48,15 @@ void print_vector(std::vector<double> v) {
   cout << endl;
 }
 
+void print_vector_to_file(char const *filename, std::vector<double> v) {
+    ofstream file;
+    file.open(filename);
+    for (auto i: v) {
+        file << i << ' ';
+    }
+    file.close();
+}
+
 int main(int argc, char *argv[]) {
 
   if (argc < 7) {
@@ -165,6 +174,10 @@ int main(int argc, char *argv[]) {
 
   std::vector<double> sliced_a_matches = confidence_interval(a_matches_spw, 95);
   cout << sliced_a_matches.size() << endl;
+ 
+  //write data to file
+  char const *fname = "../data/a_spw_interval.dat";
+  print_vector_to_file(fname, sliced_a_matches); 
 
   return 0;
   for (int p=0; p<2; p++) {
