@@ -38,8 +38,15 @@
 
 using namespace std;
 
-#define TRIALS 2
+#define TRIALS 100
 
+//Debugging purposes
+void print_vector(std::vector<double> v) {
+  for (auto i : v) {
+      cout << i << ' ';
+  }
+  cout << endl;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -149,22 +156,16 @@ int main(int argc, char *argv[]) {
     a_matches_spw.push_back((double)m.serves_won(0)/m.serves_played(0));
     b_matches_spw.push_back((double)m.serves_won(1)/m.serves_played(1));
   }
+  cout << TRIALS << " matches simulated."  << endl << endl;
 
   // Sorting simulated data
   sort(game_lengths.begin(), game_lengths.end());
   sort(a_matches_spw.begin(), a_matches_spw.end());
   sort(b_matches_spw.begin(), b_matches_spw.end());
 
-  for (auto i : a_matches_spw) {
-      cout << i << ' ';
-  }
-  cout << endl;
-  for (auto i : b_matches_spw) {
-      cout << i << ' ';
-  }
-  cout << endl;
-  
-  cout << TRIALS << " matches simulated."  << endl << endl;
+  std::vector<double> sliced_a_matches = confidence_interval(a_matches_spw, 95);
+  cout << sliced_a_matches.size() << endl;
+
   return 0;
   for (int p=0; p<2; p++) {
     cout << "Player " << p + 1 << " served this many times: " << (double) total_serves[p] << endl;
@@ -215,3 +216,21 @@ double median_game_length(std::vector<int> game_lengths, int num_matches) {
                          game_lengths[(num_matches/2) - 1])/2;
     } else { return game_lengths[num_matches / 2]; }
 }
+
+// Vector MUST be sorted before calling this function
+// Slices the vector to create a confidence interval
+std::vector<double> confidence_interval(std::vector<double> v, int confidence) {
+    assert(std::is_sorted(v.begin(), v.end()));
+    int length = v.size();
+    cout << length << endl;
+    int first = ((double)length/100)*((double)(100-confidence)/2);
+    cout << first << endl;
+    int last  = length*(confidence + ((double)(100-confidence)/2))/100;
+    cout << last << endl;
+
+    std::vector<double>::const_iterator first_it = v.begin() + first;
+    std::vector<double>::const_iterator last_it  = v.begin() + last;
+
+    return std::vector<double>(first_it, last_it);
+}
+
