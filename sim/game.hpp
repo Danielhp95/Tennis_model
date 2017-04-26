@@ -1,3 +1,5 @@
+using namespace std;
+
 class Game {
 private:
   Match *match;

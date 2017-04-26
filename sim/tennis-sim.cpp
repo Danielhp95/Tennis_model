@@ -34,27 +34,12 @@
 //   automatically get current odds from match pages
 //   automatically get results from match pages
 
-#include <iostream>
-#include <fstream>
-#include <cassert>
-#include <cstring>
-#include <cctype>
-#include <ctime>
-#include <cmath>
-#include <cstdlib>
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <string>
-
-#define TRIALS 1
+#include "tennis-sim.hpp"
 
 using namespace std;
 
-#include "formula.hpp"
-#include "match.hpp"
-#include "set.hpp"
-#include "game.hpp"
+#define TRIALS 1
+
 
 int main(int argc, char *argv[]) {
 
@@ -111,10 +96,10 @@ int main(int argc, char *argv[]) {
   long matches_over = 0, matches_under = 0;
   double total_games = 0;
 
-  double total_serves[2];
+  int total_serves[2];
   total_serves[0] = 0;
   total_serves[1] = 0;
-  double total_serves_won[2];
+  int total_serves_won[2];
   total_serves_won[0] = 0;
   total_serves_won[1] = 0;
 
@@ -167,27 +152,51 @@ int main(int argc, char *argv[]) {
 
   for (int p=0; p<2; p++) {
     cout << "Player " << p + 1 << " served this many times: " << (double) total_serves[p] << endl;
-    cout << "Player " << p + 1 << " serve win probability: " << (double) total_serves_won[p]/total_serves[p] << endl;
+    cout << "Player " << p + 1 << " serve win probability: " << spw(p, total_serves, total_serves_won) << endl;
   }  
   cout << endl;
   for (int p=0; p<2; p++) 
-    cout << "Player " << p + 1 << " wins match with probability " << (double) winner[p]/TRIALS << " (fair odds " << (double) TRIALS/winner[p] << ")" << endl;
+    cout << "Player " << p + 1 << " wins match with probability " << win_match_probability(p, winner, TRIALS)<< " (fair odds " << (double) TRIALS/winner[p] << ")" << endl;
   cout << endl;
 
   for (int p=0; p<2; p++) 
-    cout << "Player " << p + 1 << " wins a set with probability " << (double) wins_set[p]/TRIALS << " (fair odds " << (double) TRIALS/wins_set[p] << ")" << endl;
+    cout << "Player " << p + 1 << " wins a set with probability " << win_set_probability(p, wins_set, TRIALS) << " (fair odds " << (double) TRIALS/wins_set[p] << ")" << endl;
   cout << endl;
 
   for (int p=0; p<2; p++) 
-    cout << "Player " << p + 1 << " wins in straight sets with probability " << (double) wins_straight_sets[p]/TRIALS << " (fair odds " << (double) TRIALS/wins_straight_sets[p] << ")" << endl;
+    cout << "Player " << p + 1 << " wins in straight sets with probability " << win_set_probability(p, wins_straight_sets, TRIALS) << " (fair odds " << (double) TRIALS/wins_straight_sets[p] << ")" << endl;
   cout << endl;
   cout << "Probability of tiebreaker: " << (double) tiebreak_matches/TRIALS << " (fair odds " << (double) TRIALS/tiebreak_matches << ")" << endl;
   cout << endl;
-  cout << "Median match length in games is " << (double) (game_lengths[TRIALS/2-1]+game_lengths[TRIALS/2])/2.0 << endl;
-  cout << "Average match length in games is " << (double) total_games/TRIALS << endl;
+  cout << "Median match length in games is " << median_game_length(game_lengths, TRIALS)  << endl;
+  cout << "Average match length in games is " << average_game_length(total_games, TRIALS) << endl;
   if (target_games > 0) {
     cout << "Probability of match under " << target_games << " games is " << (double) matches_under/TRIALS << " (fair odds " << (double) TRIALS/matches_under << ")" << endl;
     cout << "Probability of match over " << target_games << " games is " << (double) matches_over/TRIALS << " (fair odds " << (double) TRIALS/matches_over << ")" << endl;
   }
   return 0;
+}
+
+double spw(int player_index, int *total_serves, int *total_serves_won) {
+    return (double) total_serves_won[player_index]/total_serves[player_index];
+}
+
+double win_match_probability(int player_index, int *winner, int total_matches) {
+    return (double) winner[player_index]/total_matches;
+}
+
+double win_set_probability(int player_index, int *wins_set, int total_matches){
+    return (double) wins_set[player_index]/total_matches;
+}
+
+double average_game_length(int total_games, int num_matches) {
+    return (double) total_games/num_matches;
+}
+
+double median_game_length(std::vector<int> game_lengths, int num_matches) {
+    if (num_matches % 2 == 0) {
+        return (double) game_lengths[num_matches/2] + game_lengths[(num_matches/2) - 1]/2;
+    } else {
+        return game_lengths[num_matches / 2];
+    }
 }
