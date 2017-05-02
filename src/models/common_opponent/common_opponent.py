@@ -5,7 +5,7 @@ import os, sys
 omalley_path = os.path.abspath(os.path.join('..'))
 sys.path.append(omalley_path)
 import omalley.omalley as omalley
-tennis_atp_dao_path = os.path.abspath(os.path.join('..','dao'))
+tennis_atp_dao_path = os.path.abspath(os.path.join('..','daos'))
 sys.path.append(tennis_atp_dao_path)
 import tennisAtpDao as dao
 
