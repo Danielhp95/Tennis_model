@@ -1,0 +1,389 @@
+playing 2 sets between Novak Djokovic and Andy Murray
+Player(0x7fffc10e6b60) 'Novak Djokovic' getting data...
+*** taking activity on grass surface only
+wget --cookies=on --load-cookies=cookies 'http://www.tennisinsight.com/player_activity.php?player_id=186&activity=19' -O activity15062.html -o output.txt
+# pm = 47 (47 stats, 47 ids) po = 36 (36 counts)
+match against Juan Martin del Potro gets weight 0.5 (2)
+match against Tomas Berdych gets weight 0.5 (2)
+match against Tommy Haas gets weight 0.333333 (3)
+match against Jeremy Chardy gets weight 0.5 (2)
+match against Bobby Reynolds gets weight 1 (1)
+match against Florian Mayer gets weight 0.5 (2)
+match against Lleyton Hewitt gets weight 0.333333 (3)
+match against Florian Mayer gets weight 0.5 (2)
+match against Viktor Troicki gets weight 1 (1)
+match against Radek Stepanek gets weight 1 (1)
+match against Ryan Harrison gets weight 1 (1)
+match against Juan Carlos Ferrero gets weight 1 (1)
+match against Rafael Nadal gets weight 0.5 (2)
+match against Jo-Wilfried Tsonga gets weight 1 (1)
+match against Bernard Tomic gets weight 1 (1)
+match against Michael Llodra gets weight 1 (1)
+match against Marcos Baghdatis gets weight 1 (1)
+match against Kevin Anderson gets weight 1 (1)
+match against Jeremy Chardy gets weight 0.5 (2)
+match against Yen-Hsun Lu gets weight 1 (1)
+match against Lleyton Hewitt gets weight 0.333333 (3)
+match against Albert Montanes gets weight 1 (1)
+match against Taylor Dent gets weight 1 (1)
+match against Olivier Rochus gets weight 0.5 (2)
+match against Paolo Lorenzi gets weight 1 (1)
+match against Dudi Sela gets weight 1 (1)
+match against Mardy Fish gets weight 1 (1)
+match against Simon Greul gets weight 1 (1)
+match against Julien Benneteau gets weight 1 (1)
+match against Olivier Rochus gets weight 0.5 (2)
+match against Jurgen Melzer gets weight 1 (1)
+match against Florent Serra gets weight 1 (1)
+match against Simone Bolelli gets weight 1 (1)
+match against Michael Berrer gets weight 1 (1)
+match against David Nalbandian gets weight 1 (1)
+match against Lleyton Hewitt gets weight 0.333333 (3)
+match against Janko Tipsarevic gets weight 1 (1)
+match against Andy Murray gets weight 0.5 (2)
+match against Juan Martin del Potro gets weight 0.5 (2)
+match against Andy Murray gets weight 0.5 (2)
+match against Roger Federer gets weight 1 (1)
+match against Tomas Berdych gets weight 0.5 (2)
+match against Xavier Malisse gets weight 1 (1)
+match against Tommy Haas gets weight 0.333333 (3)
+match against Tommy Haas gets weight 0.333333 (3)
+match against Marat Safin gets weight 1 (1)
+match against Rafael Nadal gets weight 0.5 (2)
+Match statistics file ./stats/180604601.html already present.
+Match statistics file ./stats/180604501.html already present.
+Match statistics file ./stats/180604401.html already present.
+Match statistics file ./stats/180604301.html already present.
+Match statistics file ./stats/180604201.html already present.
+Match statistics file ./stats/180604101.html already present.
+Match statistics file ./stats/175774308.html already present.
+Match statistics file ./stats/175054501.html already present.
+Match statistics file ./stats/175054401.html already present.
+Match statistics file ./stats/175054301.html already present.
+Match statistics file ./stats/175054201.html already present.
+Match statistics file ./stats/175054101.html already present.
+Match statistics file ./stats/168934701.html already present.
+Match statistics file ./stats/168934602.html already present.
+Match statistics file ./stats/168934504.html already present.
+Match statistics file ./stats/168934408.html already present.
+Match statistics file ./stats/168934316.html already present.
+Match statistics file ./stats/168934232.html already present.
+Match statistics file ./stats/168934164.html already present.
+Match statistics file ./stats/162554502.html already present.
+Match statistics file ./stats/162554403.html already present.
+Match statistics file ./stats/162554305.html already present.
+Match statistics file ./stats/162554209.html already present.
+Match statistics file ./stats/162554117.html already present.
+Match statistics file ./stats/162354216.html already present.
+Match statistics file ./stats/155714406.html already present.
+Match statistics file ./stats/155714312.html already present.
+Match statistics file ./stats/155714224.html already present.
+Match statistics file ./stats/155714148.html already present.
+Match statistics file ./stats/155524402.html already present.
+Match statistics file ./stats/155524304.html already present.
+Match statistics file ./stats/155524208.html already present.
+Match statistics file ./stats/155524116.html already present.
+Match statistics file ./stats/147904117.html already present.
+Match statistics file ./stats/147714502.html already present.
+Match statistics file ./stats/147714404.html already present.
+Match statistics file ./stats/147714308.html already present.
+Match statistics file ./stats/180604701.html already present.
+Match statistics file ./stats/175774600.html already present.
+Match statistics file ./stats/175774502.html already present.
+Match statistics file ./stats/175054601.html already present.
+Match statistics file ./stats/162554601.html already present.
+Match statistics file ./stats/162354308.html already present.
+Match statistics file ./stats/155714503.html already present.
+Match statistics file ./stats/155524501.html already present.
+Match statistics file ./stats/147904209.html already present.
+Match statistics file ./stats/147714601.html already present.
+Player(0x7fffc10e6b60) 'Novak Djokovic' constructed!
+Player(0x7fffc10facd0) 'Andy Murray' getting data...
+*** taking activity on grass surface only
+wget --cookies=on --load-cookies=cookies 'http://www.tennisinsight.com/player_activity.php?player_id=411&activity=19' -O activity15062.html -o output.txt
+# pm = 46 (46 stats, 46 ids) po = 35 (35 counts)
+match against Novak Djokovic gets weight 0.5 (2)
+match against Jerzy Janowicz gets weight 1 (1)
+match against Fernando Verdasco gets weight 1 (1)
+match against Mikhail Youzhny gets weight 1 (1)
+match against Tommy Robredo gets weight 1 (1)
+match against Yen-Hsun Lu gets weight 1 (1)
+match against Benjamin Becker gets weight 0.5 (2)
+match against Marin Cilic gets weight 0.5 (2)
+match against Jo-Wilfried Tsonga gets weight 0.25 (4)
+match against Benjamin Becker gets weight 0.5 (2)
+match against Marinko Matosevic gets weight 1 (1)
+match against Nicolas Mahut gets weight 0.5 (2)
+match against Roger Federer gets weight 0.5 (2)
+match against Novak Djokovic gets weight 0.5 (2)
+match against Marcos Baghdatis gets weight 0.5 (2)
+match against Jo-Wilfried Tsonga gets weight 0.25 (4)
+match against David Ferrer gets weight 1 (1)
+match against Marin Cilic gets weight 0.5 (2)
+match against Marcos Baghdatis gets weight 0.5 (2)
+match against Ivo Karlovic gets weight 1 (1)
+match against Nikolay Davydenko gets weight 1 (1)
+match against Feliciano Lopez gets weight 1 (1)
+match against Richard Gasquet gets weight 1 (1)
+match against Ivan Ljubicic gets weight 1 (1)
+match against Tobias Kamke gets weight 1 (1)
+match against Daniel Gimeno-Traver gets weight 1 (1)
+match against Jo-Wilfried Tsonga gets weight 0.25 (4)
+match against Andy Roddick gets weight 0.5 (2)
+match against Janko Tipsarevic gets weight 1 (1)
+match against Xavier Malisse gets weight 1 (1)
+match against Jo-Wilfried Tsonga gets weight 0.25 (4)
+match against Sam Querrey gets weight 1 (1)
+match against Gilles Simon gets weight 1 (1)
+match against Jarkko Nieminen gets weight 1 (1)
+match against Jan Hajek gets weight 1 (1)
+match against Ivan Navarro gets weight 1 (1)
+match against Juan Carlos Ferrero gets weight 1 (1)
+match against Stanislas Wawrinka gets weight 1 (1)
+match against Viktor Troicki gets weight 1 (1)
+match against Ernests Gulbis gets weight 1 (1)
+match against Roger Federer gets weight 0.5 (2)
+match against Nicolas Mahut gets weight 0.5 (2)
+match against Rafael Nadal gets weight 0.5 (2)
+match against Rafael Nadal gets weight 0.5 (2)
+match against Mardy Fish gets weight 1 (1)
+match against Andy Roddick gets weight 0.5 (2)
+Match statistics file ./stats/180604701.html already present.
+Match statistics file ./stats/180604602.html already present.
+Match statistics file ./stats/180604504.html already present.
+Match statistics file ./stats/180604408.html already present.
+Match statistics file ./stats/180604316.html already present.
+Match statistics file ./stats/180604232.html already present.
+Match statistics file ./stats/180604164.html already present.
+Match statistics file ./stats/180414601.html already present.
+Match statistics file ./stats/180414501.html already present.
+Match statistics file ./stats/180414401.html already present.
+Match statistics file ./stats/180414301.html already present.
+Match statistics file ./stats/180414201.html already present.
+Match statistics file ./stats/175774601.html already present.
+Match statistics file ./stats/175774502.html already present.
+Match statistics file ./stats/175774306.html already present.
+Match statistics file ./stats/175054602.html already present.
+Match statistics file ./stats/175054503.html already present.
+Match statistics file ./stats/175054406.html already present.
+Match statistics file ./stats/175054312.html already present.
+Match statistics file ./stats/175054224.html already present.
+Match statistics file ./stats/175054148.html already present.
+Match statistics file ./stats/168934502.html already present.
+Match statistics file ./stats/168934403.html already present.
+Match statistics file ./stats/168934305.html already present.
+Match statistics file ./stats/168934209.html already present.
+Match statistics file ./stats/168934117.html already present.
+Match statistics file ./stats/168724601.html already present.
+Match statistics file ./stats/168724502.html already present.
+Match statistics file ./stats/168724308.html already present.
+Match statistics file ./stats/168724216.html already present.
+Match statistics file ./stats/162554503.html already present.
+Match statistics file ./stats/162554406.html already present.
+Match statistics file ./stats/162554312.html already present.
+Match statistics file ./stats/162554224.html already present.
+Match statistics file ./stats/162554148.html already present.
+Match statistics file ./stats/162354205.html already present.
+Match statistics file ./stats/155714502.html already present.
+Match statistics file ./stats/155714403.html already present.
+Match statistics file ./stats/155714305.html already present.
+Match statistics file ./stats/155714209.html already present.
+Match statistics file ./stats/175054701.html already present.
+Match statistics file ./stats/174864201.html already present.
+Match statistics file ./stats/168934601.html already present.
+Match statistics file ./stats/162554602.html already present.
+Match statistics file ./stats/162354303.html already present.
+Match statistics file ./stats/155714601.html already present.
+Player(0x7fffc10facd0) 'Andy Murray' constructed!
+======= Relevant matches for Novak Djokovic======
+found match v Viktor Troicki (175054401,1)
+Novak Djokovic is first in stats.
+(fsp = 75.7143, fspwp=81.1321 sspwp=52.9412 fsrpwp = 45.2381 ssrpwp = 58.0645, tspw=74.2857, trpw=50.6849)
+found match v Juan Carlos Ferrero (175054101,1)
+Novak Djokovic is first in stats.
+(fsp = 65.8824, fspwp=83.9286 sspwp=41.3793 fsrpwp = 43.75 ssrpwp = 58.3333, tspw=69.4118, trpw=48.6111)
+found match v Rafael Nadal (168934701,0.5)
+Novak Djokovic is first in stats.
+(fsp = 72.6316, fspwp=72.4638 sspwp=53.8462 fsrpwp = 32.8125 ssrpwp = 55.5556, tspw=67.3684, trpw=37.8049)
+found match v Jo-Wilfried Tsonga (168934602,1)
+Novak Djokovic is first in stats.
+(fsp = 65.8333, fspwp=77.2152 sspwp=68.2927 fsrpwp = 32.2222 ssrpwp = 53.4884, tspw=74.1667, trpw=39.0977)
+found match v Marcos Baghdatis (168934316,1)
+Novak Djokovic is first in stats.
+(fsp = 65.5738, fspwp=75 sspwp=57.1429 fsrpwp = 27.1429 ssrpwp = 46.7742, tspw=68.8525, trpw=36.3636)
+found match v Yen-Hsun Lu (162554502,1)
+Novak Djokovic is first in stats.
+(fsp = 63.0769, fspwp=85.3659 sspwp=75 fsrpwp = 35.1852 ssrpwp = 66.6667, tspw=81.5385, trpw=47.1264)
+found match v Mardy Fish (155714312,1)
+Novak Djokovic is first in stats.
+(fsp = 62.963, fspwp=74.5098 sspwp=76.6667 fsrpwp = 25 ssrpwp = 60, tspw=75.3086, trpw=39.5833)
+found match v Janko Tipsarevic (147714308,1)
+Novak Djokovic is first in stats.
+(fsp = 68.9655, fspwp=78.3333 sspwp=37.037 fsrpwp = 35.2941 ssrpwp = 54.5455, tspw=65.5172, trpw=41.0959)
+found match v Roger Federer (175054601,1)
+Novak Djokovic is second in stats.
+(fsp = 63.4783, fspwp=71.2329 sspwp=57.1429 fsrpwp = 24.6154 ssrpwp = 27.7778, tspw=66.087, trpw=25.7426)
+found match v Xavier Malisse (162354308,1)
+Novak Djokovic is second in stats.
+(fsp = 73.913, fspwp=64.7059 sspwp=41.6667 fsrpwp = 14.8936 ssrpwp = 56, tspw=58.6957, trpw=29.1667)
+found match v Rafael Nadal (147714601,0.5)
+Novak Djokovic is second in stats.
+(fsp = 76.6667, fspwp=60.8696 sspwp=47.619 fsrpwp = 32 ssrpwp = 50, tspw=57.7778, trpw=39.0244)
+AGAINST Janko Tipsarevic spw = 65.5172 rpw = 41.0959
+AGAINST Jo-Wilfried Tsonga spw = 74.1667 rpw = 39.0977
+AGAINST Juan Carlos Ferrero spw = 69.4118 rpw = 48.6111
+AGAINST Marcos Baghdatis spw = 68.8525 rpw = 36.3636
+AGAINST Mardy Fish spw = 75.3086 rpw = 39.5833
+AGAINST Rafael Nadal spw = 62.5731 rpw = 38.4146
+AGAINST Roger Federer spw = 66.087 rpw = 25.7426
+AGAINST Viktor Troicki spw = 74.2857 rpw = 50.6849
+AGAINST Xavier Malisse spw = 58.6957 rpw = 29.1667
+AGAINST Yen-Hsun Lu spw = 81.5385 rpw = 47.1264
+OVERALL (spw = [57.7778, 69.6437, 81.5385] rpw = [25.7426, 39.5887, 50.6849] )
+======= Relevant matches for Andy Murray======
+found match v Yen-Hsun Lu (180604232,1)
+Andy Murray is first in stats.
+(fsp = 63.4146, fspwp=84.6154 sspwp=66.6667 fsrpwp = 30.9859 ssrpwp = 64.8649, tspw=78.0488, trpw=42.5926)
+found match v Jo-Wilfried Tsonga (180414501,0.25)
+Andy Murray is first in stats.
+(fsp = 60.9756, fspwp=80 sspwp=53.125 fsrpwp = 32.7273 ssrpwp = 50, tspw=69.5122, trpw=38.8235)
+found match v Roger Federer (175774601,0.5)
+Andy Murray is first in stats.
+(fsp = 50.5747, fspwp=79.5455 sspwp=62.7907 fsrpwp = 35.2941 ssrpwp = 62.963, tspw=71.2644, trpw=44.8718)
+found match v Marcos Baghdatis (175774306,0.5)
+Andy Murray is first in stats.
+(fsp = 63.8889, fspwp=76.087 sspwp=61.5385 fsrpwp = 36.3636 ssrpwp = 60, tspw=70.8333, trpw=44.5545)
+found match v Jo-Wilfried Tsonga (175054602,0.25)
+Andy Murray is first in stats.
+(fsp = 60.3604, fspwp=74.6269 sspwp=63.6364 fsrpwp = 24.7059 ssrpwp = 68, tspw=70.2703, trpw=40.7407)
+found match v Marcos Baghdatis (175054312,0.5)
+Andy Murray is first in stats.
+(fsp = 63.2479, fspwp=68.9189 sspwp=65.1163 fsrpwp = 37.2093 ssrpwp = 51.4706, tspw=67.5214, trpw=43.5065)
+found match v Jo-Wilfried Tsonga (168724601,0.25)
+Andy Murray is first in stats.
+(fsp = 63.5294, fspwp=83.3333 sspwp=54.8387 fsrpwp = 24.6377 ssrpwp = 50, tspw=72.9412, trpw=34.5133)
+found match v Janko Tipsarevic (168724308,1)
+Andy Murray is first in stats.
+(fsp = 69.2308, fspwp=73.3333 sspwp=60 fsrpwp = 43.1818 ssrpwp = 37.037, tspw=69.2308, trpw=40.8451)
+found match v Xavier Malisse (168724216,1)
+Andy Murray is first in stats.
+(fsp = 61.7978, fspwp=69.0909 sspwp=73.5294 fsrpwp = 30.7692 ssrpwp = 52.1739, tspw=70.7865, trpw=36.3636)
+found match v Jo-Wilfried Tsonga (162554503,0.25)
+Andy Murray is first in stats.
+(fsp = 54.6218, fspwp=83.0769 sspwp=62.963 fsrpwp = 33.6842 ssrpwp = 49.0196, tspw=73.9496, trpw=39.0411)
+found match v Juan Carlos Ferrero (155714502,1)
+Andy Murray is first in stats.
+(fsp = 63.1579, fspwp=87.5 sspwp=60.7143 fsrpwp = 40.3226 ssrpwp = 61.5385, tspw=77.6316, trpw=46.5909)
+found match v Viktor Troicki (155714305,1)
+Andy Murray is first in stats.
+(fsp = 65.3333, fspwp=87.7551 sspwp=53.8462 fsrpwp = 26.5306 ssrpwp = 63.8889, tspw=76, trpw=42.3529)
+found match v Roger Federer (175054701,0.5)
+Andy Murray is second in stats.
+(fsp = 56.051, fspwp=69.3182 sspwp=47.8261 fsrpwp = 24.4444 ssrpwp = 51.2195, tspw=59.8726, trpw=32.8244)
+found match v Rafael Nadal (168934601,0.5)
+Andy Murray is second in stats.
+(fsp = 58.4071, fspwp=72.7273 sspwp=48.9362 fsrpwp = 18.5714 ssrpwp = 42.4242, tspw=62.8319, trpw=26.2136)
+found match v Rafael Nadal (162554602,0.5)
+Andy Murray is second in stats.
+(fsp = 59.7826, fspwp=78.1818 sspwp=56.7568 fsrpwp = 22.0588 ssrpwp = 41.3793, tspw=69.5652, trpw=27.8351)
+found match v Mardy Fish (162354303,1)
+Andy Murray is second in stats.
+(fsp = 48.6842, fspwp=89.1892 sspwp=51.2821 fsrpwp = 20.3704 ssrpwp = 48.1481, tspw=69.7368, trpw=29.6296)
+AGAINST Janko Tipsarevic spw = 69.2308 rpw = 40.8451
+AGAINST Jo-Wilfried Tsonga spw = 71.6683 rpw = 38.2797
+AGAINST Juan Carlos Ferrero spw = 77.6316 rpw = 46.5909
+AGAINST Marcos Baghdatis spw = 69.1774 rpw = 44.0305
+AGAINST Mardy Fish spw = 69.7368 rpw = 29.6296
+AGAINST Rafael Nadal spw = 66.1985 rpw = 27.0243
+AGAINST Roger Federer spw = 65.5685 rpw = 38.8481
+AGAINST Viktor Troicki spw = 76 rpw = 42.3529
+AGAINST Xavier Malisse spw = 70.7865 rpw = 36.3636
+AGAINST Yen-Hsun Lu spw = 78.0488 rpw = 42.5926
+OVERALL (spw = [59.8726, 71.4047, 78.0488] rpw = [26.2136, 38.6557, 46.5909] )
+Novak Djokovic v. Andy Murray
+#
+Common opponent match analysis: 
+### working with opponent Janko Tipsarevic
+### for Novak Djokovic spw = 65.5172 rpw = 41.0959
+### Andy Murray spw = 69.2308 rpw = 40.8451
+### Novak Djokovic beats Janko Tipsarevic with prob 0.799111
+### Andy Murray beats Janko Tipsarevic with prob 0.894624
+@@@ anticipated difference in spw = -3.46271 (56.5373, 60) 
+# via Janko Tipsarevic, Novak Djokovic wins 31.9054% (#) of matches OR 32.7349% (@) of matches
+### working with opponent Jo-Wilfried Tsonga
+### for Novak Djokovic spw = 74.1667 rpw = 39.0977
+### Andy Murray spw = 71.6683 rpw = 38.2797
+### Novak Djokovic beats Jo-Wilfried Tsonga with prob 0.943778
+### Andy Murray beats Jo-Wilfried Tsonga with prob 0.885601
+@@@ anticipated difference in spw = 3.31645 (63.3164, 60) 
+# via Jo-Wilfried Tsonga, Novak Djokovic wins 68.4389% (#) of matches OR 66.582% (@) of matches
+### working with opponent Juan Carlos Ferrero
+### for Novak Djokovic spw = 69.4118 rpw = 48.6111
+### Andy Murray spw = 77.6316 rpw = 46.5909
+### Novak Djokovic beats Juan Carlos Ferrero with prob 0.989348
+### Andy Murray beats Juan Carlos Ferrero with prob 0.995
+### IGNORING OPPONENT Juan Carlos Ferrero
+### working with opponent Marcos Baghdatis
+### for Novak Djokovic spw = 68.8525 rpw = 36.3636
+### Andy Murray spw = 69.1774 rpw = 44.0305
+### Novak Djokovic beats Marcos Baghdatis with prob 0.737349
+### Andy Murray beats Marcos Baghdatis with prob 0.951847
+@@@ anticipated difference in spw = -7.99173 (52.0083, 60) 
+# via Marcos Baghdatis, Novak Djokovic wins 12.4359% (#) of matches OR 15.2429% (@) of matches
+### working with opponent Mardy Fish
+### for Novak Djokovic spw = 75.3086 rpw = 39.5833
+### Andy Murray spw = 69.7368 rpw = 29.6296
+### Novak Djokovic beats Mardy Fish with prob 0.961979
+### Andy Murray beats Mardy Fish with prob 0.470576
+@@@ anticipated difference in spw = 15.5255 (75.5255, 60) 
+# via Mardy Fish, Novak Djokovic wins 96.6061% (#) of matches OR 97.4322% (@) of matches
+### working with opponent Rafael Nadal
+### for Novak Djokovic spw = 62.5731 rpw = 38.4146
+### Andy Murray spw = 66.1985 rpw = 27.0243
+### Novak Djokovic beats Rafael Nadal with prob 0.549951
+### Andy Murray beats Rafael Nadal with prob 0.213698
+@@@ anticipated difference in spw = 7.76487 (67.7649, 60) 
+# via Rafael Nadal, Novak Djokovic wins 81.8058% (#) of matches OR 84.0707% (@) of matches
+### working with opponent Roger Federer
+### for Novak Djokovic spw = 66.087 rpw = 25.7426
+### Andy Murray spw = 65.5685 rpw = 38.8481
+### Novak Djokovic beats Roger Federer with prob 0.171113
+### Andy Murray beats Roger Federer with prob 0.710325
+@@@ anticipated difference in spw = -12.5871 (47.4129, 60) 
+# via Roger Federer, Novak Djokovic wins 7.76494% (#) of matches OR 5.51178% (@) of matches
+### working with opponent Viktor Troicki
+### for Novak Djokovic spw = 74.2857 rpw = 50.6849
+### Andy Murray spw = 76 rpw = 42.3529
+### Novak Djokovic beats Viktor Troicki with prob 0.999137
+### Andy Murray beats Viktor Troicki with prob 0.986344
+### IGNORING OPPONENT Viktor Troicki
+### working with opponent Xavier Malisse
+### for Novak Djokovic spw = 58.6957 rpw = 29.1667
+### Andy Murray spw = 70.7865 rpw = 36.3636
+### Novak Djokovic beats Xavier Malisse with prob 0.0671722
+### Andy Murray beats Xavier Malisse with prob 0.805349
+@@@ anticipated difference in spw = -19.2878 (40.7122, 60) 
+# via Xavier Malisse, Novak Djokovic wins 1.71067% (#) of matches OR 0.871339% (@) of matches
+### working with opponent Yen-Hsun Lu
+### for Novak Djokovic spw = 81.5385 rpw = 47.1264
+### Andy Murray spw = 78.0488 rpw = 42.5926
+### Novak Djokovic beats Yen-Hsun Lu with prob 0.999679
+### Andy Murray beats Yen-Hsun Lu with prob 0.992958
+### IGNORING OPPONENT Yen-Hsun Lu
+# average spw diff is -2.38893 (*)
+# for Novak Djokovic:
+# win ratio = 3/7 = 42.8571% (fair odds = 2.33333) (#)
+# loss ratio = 4/7 = 57.1429% (fair odds = 1.75) (#)
+# win ratio = 3/7 = 42.8571% (fair odds = 2.33333) (@)
+# loss ratio = 4/7 = 57.1429% (fair odds = 1.75) (@)
+# win average = 42.9525% (fair odds = 2.32815) (#)
+# loss average = 57.0475% (fair odds = 1.75293) (#)
+# win average = 43.2065% (fair odds = 2.31446) (@)
+# loss average = 56.7935% (fair odds = 1.76077) (@)
+# 
+# Common Previous Opponents with Different Results: 
+# Novak Djokovic d. Mardy Fish d. Andy Murray
+# Novak Djokovic d. Rafael Nadal d. Andy Murray
+# Andy Murray d. Roger Federer d. Novak Djokovic
+# Andy Murray d. Xavier Malisse d. Novak Djokovic
+# Common opponents = 10
