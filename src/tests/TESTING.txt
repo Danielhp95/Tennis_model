@@ -1,8 +1,7 @@
 Use the command:
 $ pytest <filename>
-
 To run the tests for a specific file.
+
 Use the command
 $ pytest
-
 To run all tests on the directory.

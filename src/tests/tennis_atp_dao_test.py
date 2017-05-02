@@ -2,7 +2,7 @@ import unittest
 import os, sys
 daos_path = os.path.abspath(os.path.join('..'))
 sys.path.append(daos_path)
-from daos.tennisAtpDao import tennisAtpDao as dao
+from daos import tennisAtpDao as dao
 import pandas as pd
 
 
