@@ -7,3 +7,6 @@
 *.sw*
 NOTES.txt
 .cache/
+
+# Ignoring hidden directories
+.*
