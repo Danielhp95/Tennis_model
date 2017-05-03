@@ -1,7 +1,8 @@
-from pandas import read_csv
+import os
 import pandas as pd
+from pandas import read_csv
 
-DATA_DIR    = r'/home/dh1213/tennis_model/data/tennis_atp/'
+DATA_DIR     = os.path.abspath(os.path.join('..','data','tennis_atp'))
 MATCH_FILES = 'atp_matches_' # File name follow pattern -> atp_matches_{year}.csv 
 EXTENSION   = '.csv'
 CURRENT_YEAR = 2017 # Change once a year!
