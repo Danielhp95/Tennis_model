@@ -14,8 +14,9 @@ class tennis_atp_dao_test(unittest.TestCase):
 
     def test_can_concatenate_multiple_files(self):
         directory = r'test_data/single_match'
-
-        c_df = dao.load_by_year(directory, 3, earliest_year=1)
+        dao.DATA_DIR = directory
+        dao.MATCH_FILES = ''
+        c_df = dao.read_by_date(1, latest=3)
 
         # Technical debt: Compare whole row, not just winner name
         assert(len(c_df[c_df.winner_name == 'Stanislas Wawrinka']) == 1)
@@ -27,8 +28,8 @@ class tennis_atp_dao_test(unittest.TestCase):
         dao.DATA_DIR      = directory
         dao.MATCH_FILES = 'common_opponents'
         set_com_opps, df_com_opps = dao.common_opponents('Stanislas Wawrinka','Tatsuma Ito',
-                                                          latest_year=1,
-                                                          earliest_year=1)
+                                                          earliest=1,
+                                                          latest=1)
 
         assert(len(set_com_opps) == 1)
         assert('Austin Krajicek' in set_com_opps)
@@ -39,7 +40,7 @@ class tennis_atp_dao_test(unittest.TestCase):
         dao.MATCH_FILES = 'common_opponents_ignore_players'
 
         set_com_opps, df_com_opps = dao.common_opponents('Stanislas Wawrinka','Tatsuma Ito',
-                                                         latest_year=1,earliest_year=1, courts=["Hard"])
+                                                         earliest=1,latest=1, courts=["Hard"])
 
         assert(len(set_com_opps) == 1)
         assert('Austin Krajicek' in set_com_opps)
@@ -53,7 +54,7 @@ class tennis_atp_dao_test(unittest.TestCase):
         dao.DATA_DIR = directory
         dao.MATCH_FILES = 'common_opponents_nan_values'
         com_opps, df = dao.common_opponents('Stanislas Wawrinka','Tatsuma Ito',
-                                            latest_year=1,earliest_year=1)
+                                            earliest=1,latest=1)
        
         assert(len(com_opps) == 0)
         assert(len(df) == 0)
@@ -64,10 +65,20 @@ class tennis_atp_dao_test(unittest.TestCase):
         dao.MATCH_FILES = 'common_opponents'
 
         com_opps, df = dao.common_opponents('Stanislas Wawrinka','Tatsuma Ito',
-                                            latest_year=1,earliest_year=1,
+                                            earliest=1,latest=1,
                                             courts=["Hard"])
         self.assertEqual(len(com_opps),1)
         self.assertEqual(len(df),2)
+
+    def test_can_filter_by_player(self):
+        directory         = r'test_data/'
+        dao.DATA_DIR      = directory
+        dao.MATCH_FILES = 'filter_by_player'
+        df_1 = dao.read_by_date(1, latest=1)
+        df = dao.filter_by_player(df_1,'Stanislas Wawrinka')
+
+        for index, row in df.iterrows():
+            assert (row['winner_name'] == 'Stanislas Wawrinka') or (row['loser_name'] == 'Stanislas Wawrinka')
 
             
 if __name__ == '__main__':

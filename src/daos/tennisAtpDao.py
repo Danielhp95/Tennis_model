@@ -2,15 +2,15 @@ import os
 import pandas as pd
 from pandas import read_csv
 
-DATA_DIR     = os.path.abspath(os.path.join('..','data','tennis_atp'))
+DATA_DIR     = os.path.abspath(os.path.join(__file__, '..','..', '..','data','tennis_atp')) + '/'
 MATCH_FILES = 'atp_matches_' # File name follow pattern -> atp_matches_{year}.csv 
 EXTENSION   = '.csv'
 CURRENT_YEAR = 2017 # Change once a year!
 
 def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"],
-                     latest_year=CURRENT_YEAR, earliest_year=CURRENT_YEAR):
+                     earliest=CURRENT_YEAR, latest=CURRENT_YEAR):
 
-    match_info = load_by_year(DATA_DIR + MATCH_FILES, latest_year, earliest_year)
+    match_info = read_by_date(earliest, latest=latest)
 
     # Surface filtering
     com_opponents_info = filter_by_court(match_info, courts)
@@ -31,16 +31,10 @@ def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"]
 
     return com_opponents, com_opponents_info
 
-'''
-    Years decrement in loops because most recent data is the most valuable
-    for any model.
-'''
-def load_by_year(directory, latest_year, earliest_year=None, df=None, keys=[]):
-    if earliest_year == None:
-        earliest_year = latest_year
-    range_of_years = [str(year) for year in range(latest_year, earliest_year -1, -1)]
+def read_by_date(earliest, latest=CURRENT_YEAR, df=None, keys=[]):
+    range_of_years = [str(year) for year in range(latest, earliest -1, -1)]
     all_frames_lst = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
-                         [directory + year + EXTENSION for year in range_of_years])
+                         [DATA_DIR + MATCH_FILES + year + EXTENSION for year in range_of_years])
    
     all_frames = pd.concat(all_frames_lst, keys=range_of_years)
     if df !=None:
@@ -50,6 +44,9 @@ def load_by_year(directory, latest_year, earliest_year=None, df=None, keys=[]):
 # TODO: consider court where there is no surface data
 def filter_by_court(df, courts):
     return df[df.surface.isin(courts)]
+
+def filter_by_player(df, player):
+    return df[(df.winner_name == player) | (df.loser_name == player)]
 
 def filter_by_common_opponent(df, player_a, player_b, com_opponents):
     return  df[((df.winner_name == player_a) & (df.loser_name.isin(com_opponents))) |

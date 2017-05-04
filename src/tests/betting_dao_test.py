@@ -25,6 +25,19 @@ class betting_dao_test(unittest.TestCase):
         assert len(df_1) + len(df_2) == len(atp_df)
         assert len(df_3) + len(df_4) == len(wtp_df)
 
+    def test_can_filter_by_date_ignore_wtp(self):
+        directory = r'test_data/betting_data/'
+        df_1 = pd.read_excel(directory + '2012.xls')
+        df_2 = pd.read_excel(directory + '2013.xlsx')
+    
+        dao.DATA_DIR = directory
+        atp_df, wtp_df = dao.read_by_date(2012, latest=2013, ignore_wtp=True)
+
+        assert len(df_1) + len(df_2) == len(atp_df)
+        assert wtp_df == None
+
+
+
     def test_can_filter_by_tournament(self):
         directory = r'test_data/betting_data/test.xlsx'
         df = pd.read_excel(directory)
