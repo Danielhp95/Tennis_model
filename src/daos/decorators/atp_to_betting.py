@@ -17,6 +17,12 @@ def change_name_atp_to_betting(df):
     df['loser_name']   = df['loser_name'].apply(format_change)
     return df
 
+def join_atp_and_bet_tables(atp=None, bet=None):
+    range_in_days = 3
+    atp, bet = dec.fix_dates_discrepancies(atp, bet, 3)
+    res = pd.merge(bet, atp, how='inner',
+                   left_on=['Date','Winner','Loser'],
+                   right_on=['tourney_date','winner_name','loser_name'])
 '''
  Dates do not match in atp and betting databases. This could be due to different timezones.
  This function checks if dates are within a small range, and renders them equal in that case,
