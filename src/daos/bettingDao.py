@@ -8,12 +8,12 @@ CURRENT_YEAR = 2017
 
 def read_by_date(earliest, latest=CURRENT_YEAR, ignore_wtp=False):
     range_of_years = [str(year) for year in range(latest, earliest -1, -1)]
-    all_frames_lst     = map(lambda x: read_excel(x), [DATA_DIR + year for year in range_of_years])
+    all_frames_lst = map(lambda x: read_excel(x), [DATA_DIR + year for year in range_of_years])
 
     wtp_all_frames_lst, wtp_df = None, None
     if not ignore_wtp:
         wtp_all_frames_lst = map(lambda x: read_excel(x), [DATA_DIR + year + 'w' for year in range_of_years])
-        wtp_all_frames_lst = filter(lambda x: x != None, wtp_all_frames_lst) # Some years lack women's records
+        wtp_all_frames_lst = filter(lambda x: x is not None, wtp_all_frames_lst) # Some years lack women's records
         if len(wtp_all_frames_lst) > 0:
             wtp_df = pd.concat(wtp_all_frames_lst, keys=range_of_years)
 
