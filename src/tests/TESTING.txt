@@ -5,3 +5,7 @@ To run the tests for a specific file.
 Use the command
 $ pytest
 To run all tests on the directory.
+
+For coverage on the whole project run command
+$ pytest --cov=../ .
+Must be run on this directory
