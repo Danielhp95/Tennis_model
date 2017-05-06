@@ -22,7 +22,7 @@ class CommonOpponent(object):
         self.MIN_OPP_THRESHOLD = 4
         self.latest_year      = 2017 # change once a year
         self.earliest=_year   = 2017
-        self.courts = ["Hard", "Clay", "Grass", "Carpet"] #TODO Ask Wil if there are more courts
+        self.courts = ["Hard", "Clay", "Grass", "Carpet"]
 
     def check_min_opponent_threshold(self, com_ops_set):
         print("Common opponents: " + str(len(com_ops_set)))
@@ -101,9 +101,8 @@ class CommonOpponent(object):
 if __name__ == '__main__':
     com = CommonOpponent()
     com.courts        = ["Hard", "Clay"]
-    com.earliest_year = 2014
-    com.latest_year   = 2017
-
+    com.earliest_year = 2014 
+    com.latest_year   = 2017 
     p = com.prob_a_beating_b('Roger Federer' ,'Nikoloz Basilashvili')
     print(p)
 

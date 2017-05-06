@@ -23,6 +23,14 @@ def join_atp_and_bet_tables(atp=None, bet=None):
     res = pd.merge(bet, atp, how='inner',
                    left_on=['Date','Winner','Loser'],
                    right_on=['tourney_date','winner_name','loser_name'])
+   
+    # Many columns appear in both tables, Here we drop the repeated columns from bet
+    # We will then stick to atp_dao from now on
+
+    columns_to_drop = ['Winner','Loser','Date','Tournament','Court','Surface','ATP','Location','Date']
+    res = res.drop(columns_to_drop)
+    return res
+
 '''
  Dates do not match in atp and betting databases. This could be due to different timezones.
  This function checks if dates are within a small range, and renders them equal in that case,
@@ -45,8 +53,6 @@ def fix_dates_discrepancies(atp_df, bet_df, range_in_days=1):
     
 
 def dates_within_range(range_in_days, d1, d2):
-    #d1 = datetime.strptime(d1, "%Y-%m-%d")
-    #d2 = datetime.strptime(d2, "%Y-%m-%d")
     return abs((d2 - d1).days) <= range_in_days
 
 

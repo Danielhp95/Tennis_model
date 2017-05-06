@@ -2,15 +2,17 @@ import os
 import pandas as pd
 from pandas import read_csv
 
-DATA_DIR     = os.path.abspath(os.path.join(__file__, '..','..', '..','data','tennis_atp')) + '/'
-MATCH_FILES = 'atp_matches_' # File name follow pattern -> atp_matches_{year}.csv 
-EXTENSION   = '.csv'
+MEN_DATA_DIR     = os.path.abspath(os.path.join(__file__, '..','..', '..','data','tennis_atp')) + '/atp_matches_'
+WOMEN_DATA_DIR   = os.path.abspath(os.path.join(__file__, '..','..', '..','data','tennis_wta')) + '/wta_matches_'
+EXTENSION    = '.csv'
 CURRENT_YEAR = 2017 # Change once a year!
 
 def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"],
                      earliest=CURRENT_YEAR, latest=CURRENT_YEAR):
 
-    match_info = read_by_date(earliest, latest=latest)
+    atp_match_info, wta_match_info = read_by_date(earliest, latest=latest)
+
+    match_info = atp_match_info # TODO: have league as an input
 
     # Surface filtering
     com_opponents_info = filter_by_court(match_info, courts)
@@ -20,7 +22,7 @@ def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"]
     player_b_opponents = find_opponents_for_player(player_b, match_info)
 
     # Compute intersection of opponents and remove both players from result
-    # to avoid cases in which players have faced each other. TODO: ask Will about this
+    # to avoid cases in which players have faced each other.
     com_opponents = (player_a_opponents & player_b_opponents) - set([player_a, player_b])
 
     # Find common opponents
@@ -31,15 +33,16 @@ def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"]
 
     return com_opponents, com_opponents_info
 
-def read_by_date(earliest, latest=CURRENT_YEAR, df=None, keys=[]):
+def read_by_date(earliest, latest=CURRENT_YEAR, df=None):
     range_of_years = [str(year) for year in range(latest, earliest -1, -1)]
-    all_frames_lst = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
-                         [DATA_DIR + MATCH_FILES + year + EXTENSION for year in range_of_years])
+    atp_frames     = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
+                         [MEN_DATA_DIR + year + EXTENSION for year in range_of_years])
+    wta_frames     = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
+                         [WOMEN_DATA_DIR + year + EXTENSION for year in range_of_years])
    
-    all_frames = pd.concat(all_frames_lst, keys=range_of_years)
-    if df !=None:
-        all_frames = pd.concat(df, keys=keys)
-    return all_frames
+    atp_all_frames = pd.concat(atp_frames, keys=range_of_years)
+    wta_all_frames = pd.concat(wta_frames, keys=range_of_years)
+    return atp_all_frames, wta_all_frames
    
 # TODO: consider court where there is no surface data
 def filter_by_court(df, courts):
@@ -49,7 +52,7 @@ def filter_by_player(df, player):
     return df[(df.winner_name == player) | (df.loser_name == player)]
 
 def filter_by_common_opponent(df, player_a, player_b, com_opponents):
-    return  df[((df.winner_name == player_a) & (df.loser_name.isin(com_opponents))) |
+    return df[((df.winner_name == player_a) & (df.loser_name.isin(com_opponents))) |
                ((df.loser_name == player_a) & (df.winner_name.isin(com_opponents))) |
                ((df.winner_name == player_b) & (df.loser_name.isin(com_opponents))) |
                ((df.loser_name == player_b) & (df.winner_name.isin(com_opponents)))]
