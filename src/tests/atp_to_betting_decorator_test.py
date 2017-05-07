@@ -53,8 +53,8 @@ class atp_to_betting_decorator_test(unittest.TestCase):
 
     def test_fix_dates_discrepancies(self):
         directory =  'test_data/atp_to_betting_decorator/'
-        df1 = pd.read_csv(directory + 'atp.csv')
-        df2 = pd.read_csv(directory + 'bet.csv')
+        df1 = pd.read_csv(directory + 'atp1.csv')
+        df2 = pd.read_csv(directory + 'bet1.csv')
 
         df1_f, df2_f = dec.fix_dates_discrepancies(df1, df2, range_in_days=1)
        
@@ -62,5 +62,13 @@ class atp_to_betting_decorator_test(unittest.TestCase):
         assert str(df1_f.loc[1]['tourney_date']) == '2006-01-09'
 
     def test_join_atp_bet_tables(self):
-        assert False
+        directory =  'test_data/atp_to_betting_decorator/'
+        df1 = pd.read_csv(directory + 'atp2.csv')
+        df2 = pd.read_csv(directory + 'bet2.csv')
+
+        joint_df = dec.join_atp_and_bet_tables(atp=df1,bet=df2)
+        assert len(joint_df) == 2
+        assert joint_df.loc[0]['B365W'] == 1.28
+        assert joint_df.loc[0]['loser_hand'] == 'R'
+        
 

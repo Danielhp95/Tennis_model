@@ -28,8 +28,9 @@ def join_atp_and_bet_tables(atp=None, bet=None):
     # Many columns appear in both tables, Here we drop the repeated columns from bet
     # We will then stick to atp_dao from now on
     columns_to_drop = ['Winner','Loser','Date','Tournament','Court','Surface','ATP','Location','Date']
-    res = res.drop(columns_to_drop)
+    res = res.drop(columns_to_drop, axis=1)
     return res
+
 
 '''
  Dates do not match in atp and betting databases. This could be due to different timezones.
@@ -56,5 +57,3 @@ def dates_within_range(range_in_days, d1, d2):
     date_2 = datetime.strptime(d2,'%Y-%m-%d')
     r = relativedelta(date_1,date_2)
     return abs(r.days) <= range_in_days
-
-
