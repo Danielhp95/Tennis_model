@@ -49,6 +49,8 @@ def filter_by_court(df, courts):
     return df[df.surface.isin(courts)]
 
 def filter_by_player(df, player):
+    if isinstance(player, list):
+        return df[(df.winner_name.isin(player)) | (df.loser_name.isin(player))]
     return df[(df.winner_name == player) | (df.loser_name == player)]
 
 def filter_by_common_opponent(df, player_a, player_b, com_opponents):

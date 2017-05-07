@@ -81,6 +81,18 @@ class tennis_atp_dao_test(unittest.TestCase):
         for index, row in df.iterrows():
             assert (row['winner_name'] == 'Stanislas Wawrinka') or (row['loser_name'] == 'Stanislas Wawrinka')
 
-            
+    def test_can_filter_by_multiple_players(self):
+        directory         = r'test_data/filter_by_multiple_player'
+        dao.MEN_DATA_DIR  = directory
+        dao.WOMEN_DATA_DIR  = directory
+        atp_df_1, wta_df_1 = dao.read_by_date(1, latest=1)
+
+        players = ['Stanislas Wawrinka', 'Rafael Nadal']
+        df = dao.filter_by_player(atp_df_1,players)
+
+        for index, row in df.iterrows():
+            has_filter_happened = any(map(lambda x: (row['winner_name'] == x) or (row['loser_name'] == x), players))
+            assert has_filter_happened
+
 if __name__ == '__main__':
     unittest.main()
