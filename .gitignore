@@ -7,6 +7,7 @@
 *.sw*
 NOTES.txt
 .cache/
+printtodos
 
 # Ignoring hidden directories
 .*

@@ -32,7 +32,10 @@ def filter_by_best_of(df, best_of):
     assert_value_is_within([best_of], [3,5], "Best of")
     return df[df.Best_of == best_of]
 
+# TODO: write tests for this function
 def filter_by_player(df, player):
+    if isinstance(player, list):
+        return df[(df.Winner.isin(player)) | (df.Loser.isin(player))]
     return df[(df.Winner == player) | (df.Loser == player)]
 
 def filter_by_tournament(df, tournaments):

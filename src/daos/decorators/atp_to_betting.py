@@ -1,4 +1,5 @@
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import itertools
 
@@ -19,14 +20,13 @@ def change_name_atp_to_betting(df):
 
 def join_atp_and_bet_tables(atp=None, bet=None):
     range_in_days = 3
-    atp, bet = dec.fix_dates_discrepancies(atp, bet, 3)
+    atp, bet = fix_dates_discrepancies(atp, bet, 3)
     res = pd.merge(bet, atp, how='inner',
                    left_on=['Date','Winner','Loser'],
                    right_on=['tourney_date','winner_name','loser_name'])
    
     # Many columns appear in both tables, Here we drop the repeated columns from bet
     # We will then stick to atp_dao from now on
-
     columns_to_drop = ['Winner','Loser','Date','Tournament','Court','Surface','ATP','Location','Date']
     res = res.drop(columns_to_drop)
     return res
@@ -51,8 +51,10 @@ def fix_dates_discrepancies(atp_df, bet_df, range_in_days=1):
                 break
     return atp_df, bet_df
     
-
 def dates_within_range(range_in_days, d1, d2):
-    return abs((d2 - d1).days) <= range_in_days
+    date_1 = datetime.strptime(d1,'%Y-%m-%d')
+    date_2 = datetime.strptime(d2,'%Y-%m-%d')
+    r = relativedelta(date_1,date_2)
+    return abs(r.days) <= range_in_days
 
 
