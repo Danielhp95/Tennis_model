@@ -8,11 +8,14 @@ EXTENSION    = '.csv'
 CURRENT_YEAR = 2017 # Change once a year!
 
 def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"],
-                     earliest=CURRENT_YEAR, latest=CURRENT_YEAR):
+                     earliest=CURRENT_YEAR, latest=CURRENT_YEAR, df=None):
 
-    atp_match_info, wta_match_info = read_by_date(earliest, latest=latest)
+    if df is None:
+        atp_match_info, wta_match_info = read_by_date(earliest, latest=latest)
 
-    match_info = atp_match_info # TODO: have league as an input
+        match_info = atp_match_info # TODO: have league as an input
+    else:
+        match_info = df
 
     # Surface filtering
     com_opponents_info = filter_by_court(match_info, courts)
@@ -34,11 +37,11 @@ def common_opponents(player_a, player_b, courts=["Hard","Clay","Grass","Carpet"]
     return com_opponents, com_opponents_info
 
 def read_by_date(earliest, latest=CURRENT_YEAR, df=None):
-    range_of_years = [str(year) for year in range(latest, earliest -1, -1)]
+    range_of_years = [year for year in range(latest, earliest -1, -1)]
     atp_frames     = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
-                         [MEN_DATA_DIR + year + EXTENSION for year in range_of_years])
+                         [MEN_DATA_DIR + str(year) + EXTENSION for year in range_of_years])
     wta_frames     = map(lambda x: pd.read_csv(x,skipinitialspace=True), 
-                         [WOMEN_DATA_DIR + year + EXTENSION for year in range_of_years])
+                         [WOMEN_DATA_DIR + str(year) + EXTENSION for year in range_of_years])
    
     atp_all_frames = pd.concat(atp_frames, keys=range_of_years)
     wta_all_frames = pd.concat(wta_frames, keys=range_of_years)

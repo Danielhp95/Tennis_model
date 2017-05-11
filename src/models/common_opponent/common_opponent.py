@@ -5,9 +5,9 @@ import os, sys
 omalley_path = os.path.abspath(os.path.join('..'))
 sys.path.append(omalley_path)
 import omalley.omalley as omalley
-tennis_atp_dao_path = os.path.abspath(os.path.join('..','daos'))
-sys.path.append(tennis_atp_dao_path)
-import tennisAtpDao as dao
+daos_path = os.path.abspath(os.path.join('..','daos'))
+sys.path.append(daos_path)
+from daos import tennisAtpDao as dao
 
 """
   Common opponent model
@@ -97,6 +97,25 @@ class CommonOpponent(object):
         print(zip(probabilities, com_ops_set))
         normalized_probability = sum(probabilities) / len(com_ops_set)
         return normalized_probability
+
+    def calculate_odds(self, player_a, player_b, df):
+        '''
+        Parameters:
+            player_a: Name of player A in the match
+            player_b: Name of player B in the match
+            df:       pandas.Dataframe containing all match data till player
+        '''
+        com_ops_set, self.com_ops = dao.common_opponents(player_a, player_b, df=df)
+
+        if self.check_min_opponent_threshold(com_ops_set) == -1:
+            return -1
+
+        probabilities = [self.prob_beating_through_com_opp(player_a, player_b, op)
+                 for op in com_ops_set]
+        print(zip(probabilities, com_ops_set))
+        normalized_probability = sum(probabilities) / len(com_ops_set)
+        return normalized_probability
+
 
 if __name__ == '__main__':
     com = CommonOpponent()

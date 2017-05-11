@@ -1,0 +1,8 @@
+betting run for storing statistics:
+(this) have a match dictionary where the match is the key and models, and statistics are entries
+
+    - have a dictionary per model and statistics for each match
+    - have a dictionary per statistics 
+
+Talk:
+    - Heck, you could even use this simulate economic based strategies. (show that if sales have been winning by 10%, buy buy. If they are decreasing in value, sell! sell!). In fact, you can use this to have a simulation for any event based market. Cricket, football, basketball, tennis, double tennis and even quadruple tennis if that was even a thing!
