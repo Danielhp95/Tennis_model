@@ -141,8 +141,8 @@ class BettingRun(object):
             if run_money <= 0 and not self.dirty_run:
                 print('Betting run finishes due to lack of funds')
                 break
-        
-        self.final_money = run_money #TODO:consider adding this in a finalize_stats function
+       
+        self.finalize_statistics(run_money, league)
         print("End of betting run")
         return
 
@@ -169,6 +169,12 @@ class BettingRun(object):
         self.total_bets += 1 if bet != 0 else 0
         
         self.matches_statistics[league].append((match,bet_run_match_stats))
+
+    def finalize_statistics(self, final_money, league):
+        if league == 'ATP':
+            self.atp_final_money = final_money
+        elif league == 'WTA':
+            self.wta_final_money = final_money
 
     def filter_records_by_tournament(self, tournaments):
         return filter(lambda (m, st): m['tournament'] in tournaments,

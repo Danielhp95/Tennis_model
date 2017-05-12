@@ -81,7 +81,7 @@ class betting_run_test(unittest.TestCase):
                                       initial_money = initial_money)
         btr.atp_matches = btr.atp_bet[100:200]
         btr.betting_run('ATP')
-        assert btr.final_money == btr.initial_money
+        assert btr.atp_final_money == btr.initial_money
         assert btr.total_bets == 0
 
 
@@ -130,11 +130,8 @@ class betting_run_test(unittest.TestCase):
         btr = self.create_betting_run(st.BetOnLoserStrategy, md.FiftyFiftyModel,dirty_run=True)
         btr.atp_bet = btr.atp_bet[100:300]
         btr.betting_run('ATP')
-        assert btr.final_money < 0
+        assert btr.atp_final_money < 0
 
-#    def test_statistics_model(self):
-#        for match, stats in btr.matches_statistics['ATP']:
-#
     def test_can_run_atp_and_wta(self):
         btr = self.create_betting_run(st.BetOnLoserStrategy, md.FiftyFiftyModel,dirty_run=True)
         btr.atp_bet = btr.atp_bet[100:300]
