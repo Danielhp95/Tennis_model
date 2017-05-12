@@ -57,3 +57,8 @@ class AlternateBettingStrategy(object):
         self.oddity = (self.oddity + 1) % 2
         bet = 10**(-6)
         return bet, choice
+
+class NeverBetStrategy(object):
+
+    def strategy(*args):
+        return 0, 'b'

@@ -32,7 +32,7 @@ class BettingRun(object):
                  earliest_year=None, latest_year=None, courts=None,
                  tournaments=None, players=None, rounds=None, best_of=None,
                  rank_position=None, rank_points=None, 
-                 strategy=None):
+                 strategy=None, dirty_run=False):
         assert initial_money > 0, '{initial money} must be positive'
         assert model is not None, 'There must be an input {model} to calculate the match odds' 
         assert getattr(model, 'calculate_odds', None) is not None, '{model} must implement calculate_odds function'
@@ -53,6 +53,7 @@ class BettingRun(object):
         self.model    = model
         self.strategy = strategy
         self.initialize_statistics()
+        self.dirty_run = dirty_run
         
 
 
@@ -88,21 +89,21 @@ class BettingRun(object):
         return filter_atp, filter_wta
 
 
-    #TODO: abstract this to work on any data, not only atp
-    def betting_run(self):
-        '''
-        TODO: think of the possibility of making this a super class so that
-             other implementations of betting_run can be applied
-        '''
-        # df.sort(['Date'], ascending = 1).reset_index(drop=True)
-        filtered_data  = self.atp_bet.sort(['Date'],ascending=1)
+    def betting_run(self, league):
+        if league == 'ATP':
+            matches = self.atp_matches
+            filtered_matches = self.atp_bet.sort(['Date'],ascending=1)
+        elif league == 'WTA':
+            matches = self.wta_matches
+            filtered_matches  = self.wta_bet.sort(['Date'],ascending=1)
 
         # Betting run for ATP league
         run_money = self.initial_money
-        for i, match in filtered_data.iterrows():
-            #print(match['winner_name'] + ' vs ' + match['loser_name'] + str(match['tourney_date']))
-
-            matches_up_to_date = self.atp_matches[self.atp_matches.Date <= match['Date']]
+        for i, match in filtered_matches.iterrows():
+            if self.dirty_run:
+                matches_up_to_date = matches
+            else:
+                matches_up_to_date = matches[matches.Date <= match['Date']]
 
             # Relevant stats for model and strategy
             winner_bet_odds, loser_bet_odds = self.match_betting_odds(match)
@@ -132,43 +133,28 @@ class BettingRun(object):
                 positive_outcome = choice == 'a'
                 player_bet = match['winner_name'] if choice == 'a' else match['loser_name']
                 earnings = (match_bet*winner_average_odds) if positive_outcome else -match_bet
-            if math.isnan(earnings):
-                print(match_bet)
-                print(choice)
-                print(winner_bet_odds)
-                assert not math.isnan(earnings)
-        
+                
             # Update statistics
             self.update_match_statistics(run_money, earnings, match_bet, player_bet,
-                                         model_odds_a, match)
+                                         model_odds_a, match, league)
             run_money += earnings
-            if run_money <= 0:
+            if run_money <= 0 and not self.dirty_run:
                 print('Betting run finishes due to lack of funds')
                 break
         
+        self.final_money = run_money #TODO:consider adding this in a finalize_stats function
         print("End of betting run")
         return
 
     def initialize_statistics(self):
-        '''
-        list of all statistics:
-            betting odds (per match)
-            model predictions (per match)
-            money at any point in time
-            amount bet and player (per match)
-            yearly ROI
-            player ROI
-            tournament ROI
-            league(atp/wta) ROI
-            surface ROI
-        
-        '''
+        self.total_atp_matches = len(self.atp_bet)
+        self.total_wta_matches = len(self.wta_bet)
         self.matches_statistics = {}
         self.matches_statistics['ATP'] = []
         self.matches_statistics['WTA'] = []
 
     def update_match_statistics(self, current_money, earnings, bet, player_bet,
-                                model_odds, match):
+                                model_odds, match, league):
         bet_run_match_stats = {}
         bet_run_match_stats['bet']          = bet 
         bet_run_match_stats['money']        = current_money
@@ -181,7 +167,8 @@ class BettingRun(object):
 
         roi = self.calculate_ROI(current_money + earnings, match)
         self.total_bets += 1 if bet != 0 else 0
-        self.matches_statistics['ATP'].append((match,bet_run_match_stats))
+        
+        self.matches_statistics[league].append((match,bet_run_match_stats))
 
     def filter_records_by_tournament(self, tournaments):
         return filter(lambda (m, st): m['tournament'] in tournaments,
@@ -232,9 +219,3 @@ class BettingRun(object):
                 lst.append(match[bet_exchange])
         except KeyError as e:
             pass
-
-    def get_run_data(self):
-        return self.atp_matches, self.wta_matches
-
-    def data_to_list(df):
-        return df.to_dict('records')
