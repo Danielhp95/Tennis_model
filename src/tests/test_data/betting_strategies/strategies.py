@@ -12,7 +12,8 @@ class BetOnWinnerStrategy(object):
     def strategy(self,model_odds_player_a, model_odds_player_b,
                  average_betting_exchange_odds_a, average_betting_exchange_odds_b,
                  *args):
-        return 1/average_betting_exchange_odds_a, 'a'
+
+        return 1, 'a'
 
 class RecordDatesStrategy(object):
 
@@ -45,4 +46,14 @@ class KellyCriterion(object):
         winnin_prob          = 0
         losing_prob          = 1 - winnin_prob
         bet = (winnin_prob*(average_winning_odds + 1) - 1)/average_winning_odds
-        
+    
+class AlternateBettingStrategy(object):
+    
+    def __init__(self):
+        self.oddity = 0
+
+    def strategy(*args):
+        choice = 'a' if self.oddity == 1 else 'b'
+        self.oddity = (self.oddity + 1) % 2
+        bet = 10**(-6)
+        return bet, choice

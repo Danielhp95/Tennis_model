@@ -1,5 +1,6 @@
 from __future__ import division
 import os, sys
+import math
 
 daos_path = os.path.abspath(os.path.join(__file__, '..','..'))
 sys.path.append(daos_path)
@@ -99,13 +100,16 @@ class BettingRun(object):
         # Betting run for ATP league
         run_money = self.initial_money
         for i, match in filtered_data.iterrows():
-            print(match['winner_name'] + ' vs ' + match['loser_name'] + str(match['tourney_date']))
+            #print(match['winner_name'] + ' vs ' + match['loser_name'] + str(match['tourney_date']))
 
             matches_up_to_date = self.atp_matches[self.atp_matches.Date <= match['Date']]
 
             # Relevant stats for model and strategy
-            winner_average_odds = match['B365W']
-            loser_average_odds  = match['B365L']
+            winner_bet_odds, loser_bet_odds = self.match_betting_odds(match)
+            if winner_bet_odds == [] or loser_bet_odds == []:
+                continue # there are no odds, so there can be no real betting
+            winner_average_odds = sum(winner_bet_odds)/len(winner_bet_odds)
+            loser_average_odds  = sum(loser_bet_odds)/len(loser_bet_odds)
             player_a            = match['winner_name']
             player_b            = match['loser_name']
 
@@ -120,6 +124,7 @@ class BettingRun(object):
                                    winner_average_odds, loser_average_odds, match) 
 
             # Calculate outcomes
+            earnings = 0
             if match_bet == 0: #No betting
                 earnings = 0
                 player_bet = ''
@@ -127,7 +132,12 @@ class BettingRun(object):
                 positive_outcome = choice == 'a'
                 player_bet = match['winner_name'] if choice == 'a' else match['loser_name']
                 earnings = (match_bet*winner_average_odds) if positive_outcome else -match_bet
-
+            if math.isnan(earnings):
+                print(match_bet)
+                print(choice)
+                print(winner_bet_odds)
+                assert not math.isnan(earnings)
+        
             # Update statistics
             self.update_match_statistics(run_money, earnings, match_bet, player_bet,
                                          model_odds_a, match)
@@ -153,26 +163,25 @@ class BettingRun(object):
             surface ROI
         
         '''
-        self.atp_matches_run = []
-        self.statistics = {}
-        self.statistics['roi'] = []
+        self.matches_statistics = {}
+        self.matches_statistics['ATP'] = []
+        self.matches_statistics['WTA'] = []
 
     def update_match_statistics(self, current_money, earnings, bet, player_bet,
                                 model_odds, match):
-        bet_run_info_at_this_point = {}
-        bet_run_info_at_this_point['bet']          = bet 
-        bet_run_info_at_this_point['money']        = current_money
-        bet_run_info_at_this_point['earnings']     = earnings
-        bet_run_info_at_this_point['player_bet']   = player_bet
-        bet_run_info_at_this_point['model_odds']   = model_odds
+        bet_run_match_stats = {}
+        bet_run_match_stats['bet']          = bet 
+        bet_run_match_stats['money']        = current_money
+        bet_run_match_stats['earnings']     = earnings
+        bet_run_match_stats['player_bet']   = player_bet
+        bet_run_match_stats['model_odds']   = model_odds
         winner_odds, loser_odds = self.match_betting_odds(match)
-        bet_run_info_at_this_point['winner_betting_odds'] = winner_odds
-        bet_run_info_at_this_point['loser_betting_odds']  = loser_odds
+        bet_run_match_stats['winner_betting_odds'] = winner_odds
+        bet_run_match_stats['loser_betting_odds']  = loser_odds
 
         roi = self.calculate_ROI(current_money + earnings, match)
         self.total_bets += 1 if bet != 0 else 0
-        #TODO append to a greater list
-        return
+        self.matches_statistics['ATP'].append((match,bet_run_match_stats))
 
     def filter_records_by_tournament(self, tournaments):
         return filter(lambda (m, st): m['tournament'] in tournaments,
@@ -219,10 +228,10 @@ class BettingRun(object):
 
     def safe_append(self, lst, match, bet_exchange):
         try:
-            lst.append(match[bet_exchange])
+            if not math.isnan(match[bet_exchange]):
+                lst.append(match[bet_exchange])
         except KeyError as e:
             pass
-
 
     def get_run_data(self):
         return self.atp_matches, self.wta_matches
