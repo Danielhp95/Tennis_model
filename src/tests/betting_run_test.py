@@ -85,3 +85,15 @@ class betting_run_test(unittest.TestCase):
         assert len(w_odds) == 1 and w_odds[0] ==1
         assert len(l_odds) == 1 and l_odds[0] == 1
 
+    def test_safe_append(self):
+        strat = st.RecordDatesStrategy()
+        model = md.FiftyFiftyModel()
+        btr = betting_run.BettingRun(initial_money=1,
+                                     earliest_year=2007, latest_year=2007,
+                                     model=model,
+                                     strategy=strat)
+        lst = []
+        btr.safe_append([], pd.DataFrame(zip([1],[1])), 'NoneExistent')
+        assert lst == []
+
+

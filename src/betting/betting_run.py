@@ -94,7 +94,6 @@ class BettingRun(object):
              other implementations of betting_run can be applied
         '''
         # df.sort(['Date'], ascending = 1).reset_index(drop=True)
-        ascending_data = self.atp_matches
         filtered_data  = self.atp_bet.sort(['Date'],ascending=1)
 
         # Betting run for ATP league
@@ -121,11 +120,17 @@ class BettingRun(object):
                                    winner_average_odds, loser_average_odds, match) 
 
             # Calculate outcomes
-            positive_outcome = choice == 'a'
-            earnings = (match_bet*winner_average_odds - match_bet) if positive_outcome else -match_bet
+            if match_bet == 0: #No betting
+                earnings = 0
+                player_bet = ''
+            else:
+                positive_outcome = choice == 'a'
+                player_bet = match['winner_name'] if choice == 'a' else match['loser_name']
+                earnings = (match_bet*winner_average_odds) if positive_outcome else -match_bet
 
             # Update statistics
-            self.update_match_statistics(run_money, earnings, match)
+            self.update_match_statistics(run_money, earnings, match_bet, player_bet,
+                                         model_odds_a, match)
             run_money += earnings
             if run_money <= 0:
                 print('Betting run finishes due to lack of funds')
@@ -135,8 +140,51 @@ class BettingRun(object):
         return
 
     def initialize_statistics(self):
+        '''
+        list of all statistics:
+            betting odds (per match)
+            model predictions (per match)
+            money at any point in time
+            amount bet and player (per match)
+            yearly ROI
+            player ROI
+            tournament ROI
+            league(atp/wta) ROI
+            surface ROI
+        
+        '''
+        self.atp_matches_run = []
         self.statistics = {}
         self.statistics['roi'] = []
+
+    def update_match_statistics(self, current_money, earnings, bet, player_bet,
+                                model_odds, match):
+        bet_run_info_at_this_point = {}
+        bet_run_info_at_this_point['bet']          = bet 
+        bet_run_info_at_this_point['money']        = current_money
+        bet_run_info_at_this_point['earnings']     = earnings
+        bet_run_info_at_this_point['player_bet']   = player_bet
+        bet_run_info_at_this_point['model_odds']   = model_odds
+        winner_odds, loser_odds = self.match_betting_odds(match)
+        bet_run_info_at_this_point['winner_betting_odds'] = winner_odds
+        bet_run_info_at_this_point['loser_betting_odds']  = loser_odds
+
+        roi = self.calculate_ROI(current_money + earnings, match)
+        self.total_bets += 1 if bet != 0 else 0
+        #TODO append to a greater list
+        return
+
+    def filter_records_by_tournament(self, tournaments):
+        return filter(lambda (m, st): m['tournament'] in tournaments,
+                      self.matches_with_stats)
+
+    def filter_records_by_player(self, players):
+        return filter(lambda (m, st): (m['winner_name'] in players) or (m['loser_name'] in players),
+                      self.matches_with_stats)
+
+    def filter_records_by_surface(self, surfaces):
+        return filter(lambda (m, st): m['surface'] in surfaces,
+                      self.matches_with_stats)
 
     def calculate_ROI(self, current_money, match):
         return (current_money - self.initial_money) / self.initial_money
@@ -175,11 +223,6 @@ class BettingRun(object):
         except KeyError as e:
             pass
 
-
-    def update_match_statistics(self, current_money, earnings, match):
-        roi = self.calculate_ROI(current_money + earnings, match)
-        self.total_bets +=1
-        return
 
     def get_run_data(self):
         return self.atp_matches, self.wta_matches
