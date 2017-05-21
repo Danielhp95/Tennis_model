@@ -26,7 +26,7 @@ class Match(object):
             is_final_set = (self.sets_won[0] == self.sets_to_win - 1) and \
                     (self.sets_won[1] == self.sets_to_win - 1)
 
-            current_set = Set(self, self.final_set, self.tiebreaker_final_set,
+            current_set = Set(self, is_final_set, self.tiebreaker_final_set,
                               self.spw)
 
             set_winner  =  current_set.play()

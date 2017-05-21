@@ -38,6 +38,11 @@ def filter_by_player(df, player):
         return df[(df.Winner.isin(player)) | (df.Loser.isin(player))]
     return df[(df.Winner == player) | (df.Loser == player)]
 
+# TODO: write tests for this function
+def filter_head_to_head_(df, player1, player2):
+    return df[((df.Winner == player1) & (df.Loser == player2)) |
+              ((df.Winner == player2) & (df.Loser == player1))]
+
 def filter_by_tournament(df, tournaments):
     assert_value_is_within(tournaments, df.Tournament.unique(), "Tournaments")
     return df[df.Tournament.isin(tournaments)]

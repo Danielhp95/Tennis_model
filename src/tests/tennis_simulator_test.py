@@ -74,21 +74,45 @@ class TennisSimulatorTest(unittest.TestCase):
         winner = s.play()
         assert m.tiebreaker == True
 
+    ### Tests for Match class ###
+
     def test_match_min_amount_of_sets_best_of_3(self):
-        assert False
+        spw = [1.0, 0.0]
+        m = tennis_match.Match(spw,3, False)
+        winner = m.play()
+        assert winner == 0
+        assert m.sets_won == [2,0]
+        assert m.total_serves_won == [24,0]
+        assert m.total_serves == [24,24]
 
     def test_match_min_amount_of_sets_best_of_5(self):
-        assert False
+        spw = [1.0, 0.0]
+        m = tennis_match.Match(spw,5, False)
+        winner = m.play()
+        assert winner == 0
+        assert m.sets_won == [3,0]
+        assert m.total_serves_won == [36,0]
+        assert m.total_serves == [36,36]
 
     def test_match_min_player_b_wins(self):
-        assert False
+        spw = [0.0, 1.0]
+        m = tennis_match.Match(spw,5, False)
+        winner = m.play()
+        assert winner == 1
+        assert m.sets_won == [0,3]
+        assert m.total_serves_won == [0,36]
+        assert m.total_serves == [36,36]
 
-    def test_match_total_serves_and_total_serves_won(self):
-        assert False
+    def test_match_tiebreaker_final_set(self):
+        spw = [0.0,1.0]
+        tiebreaker_final_set = True
+        m = tennis_match.Match(spw, 5, tiebreaker_final_set)
+        winner = m.play()
+        assert m.tiebreaker_final_set == True
+        assert winner == 1
+        assert m.sets_won == [0,3]
+        assert m.total_serves_won == [0.0,36.0]
 
-    def test_statistics_COMEUPWITHSOMEOFTHESE(self):
-
-    ### Tests for Match class ###
     def test_match_switch_server(self):
         m = tennis_match.Match([0,0], 3, False)
         m.switch_server()
@@ -97,3 +121,23 @@ class TennisSimulatorTest(unittest.TestCase):
         assert m.get_server() == 0
         m.switch_server()
         assert m.get_server() == 1
+
+    ### Tests for STATISTICS ###
+
+#   def test_statistics_median_game_length(self):
+#       assert False
+
+#   def tsst_statistics_average_game_length(self):
+#       assert False
+
+#   def test_statistics_win_game_probability(self):
+#       assert False
+
+#   def test_statistics_win_set_probability(self):
+#       assert False
+
+#   def test_statistics_win_match_probability(self):
+#       assert False
+
+#   def test_statistics_serve_win_probability_both_players(self):
+#       assert False
