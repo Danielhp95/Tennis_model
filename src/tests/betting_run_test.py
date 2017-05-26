@@ -1,5 +1,4 @@
 import unittest
-import inspect
 import os, sys
 import pandas as pd
 betting_path = os.path.abspath(os.path.join('..'))
