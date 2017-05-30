@@ -169,6 +169,17 @@ class GameLevelTest(unittest.TestCase):
         real_final_trans_matrix = self.create_trans_matrix_lead_golden(g.wp, g.lp)
         np.testing.assert_allclose(real_final_trans_matrix, trans_matrix, rtol=1e-1)
 
+    def test_calculate_states_from_indexes(self):
+        g = gl.GameLevel(best_of=3)
+        g.wp = 1
+        g.lp = -1
+        number_of_transient_states = 4
+        valid_indexes = [0,6,12,18]
+        real_st_to_in = {(0,0):0,(1,0):6,(0,1):12,(1,1):18}
+        real_in_to_st = {0:(0,0),6:(1,0),12:(0,1),18:(1,1)}
+        in_to_st, st_to_in = g.calculate_states_from_indexes(number_of_transient_states, valid_indexes)
+        assert real_st_to_in == st_to_in
+        assert real_in_to_st == in_to_st
 
     ### Util functions ###
     def assert_is_over_outcome(self, goal=None, lead=None, golden=float("inf"),

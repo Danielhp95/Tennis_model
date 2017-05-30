@@ -14,18 +14,19 @@ class GameLevel:
         # if there is a best_of, there can not be any lead or golden point,
         # because the game will end after finishing (best_of / 2) games
         if best_of is not None:
-            self.golden = math.ceil(best_of / 2) 
+            self.golden = float('inf')
             self.lead   = None
         else:
             self.lead   = lead
             self.golden = golden
+        self.index_to_state = {}
+        self.state_to_index = {}
 
 
 
     '''
         At this point in time, the transition matrix {matrix} has been initiated.
         This function populates a part of the {matrix} using the {valid_indexes}.
-        {valid_indexes} is an iterator.????
 
         There will be {number_of_transient_states} state additions.
         All winning transitions will point to {win_index}
@@ -35,7 +36,7 @@ class GameLevel:
             win_index, lose_index):
         # Initialize state population
         initial_index          = valid_indexes[0]
-        self.states_populated  = {initial_index : (0,0)} # we may need other datatype
+        self.states_populated  = {initial_index : (0,0)}
         self.index_connections = {}
 
         # Indexes outside current game level
@@ -47,8 +48,6 @@ class GameLevel:
         if self.golden == float('inf') and self.lead > 0:
             adv_states        = valid_indexes[self.goal**2:]
             valid_indexes     = valid_indexes[:self.goal**2]
-            print(adv_states)
-            print(valid_indexes)
             advantage = 1
             assert len(adv_states) % 2 == 0
             while len(adv_states) > 0:
@@ -84,14 +83,13 @@ class GameLevel:
             outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
 
             win_index  = self.mark_outcome(outcome_a, (s_a+1, s_b),
-                                           i, available_indexes, matrix, self.wp)
+                    i, available_indexes, matrix, self.wp)
             lose_index = self.mark_outcome(outcome_b, (s_a, s_b+1), i,
-                                           available_indexes, matrix, self.lp)
+                    available_indexes, matrix, self.lp)
             self.index_connections[i] = (win_index, lose_index)
 
         # The part of the matrix corresponding to this part of the game must be filled by now
         # There must be no available indexes left
-        # The number of states populated must be equal to the number of transient states
         assert len(available_indexes) == 0
 
 
@@ -136,6 +134,67 @@ class GameLevel:
             transition_matrix[cur_index][next_index] = p
             return next_index
 
+    # TODO: add lead advantage
+    def calculate_states_from_indexes(self, number_of_transient_states, valid_indexes):
+        # Initialize state population
+        initial_index = valid_indexes[0]
+        initial_state = (0,0)
+        self.st_to_in = {}
+        self.in_to_st = {}
+        self.index_to_state[initial_index] = (0,0)
+        self.state_to_index[initial_state] = initial_index
+
+        # Indexes outside current game level
+        #self.win_index   = win_index
+        #self.lose_index  = lose_index
+
+        available_indexes = valid_indexes[1:]
+        for i in valid_indexes:
+            s_a ,s_b = self.index_to_state[i]
+
+            #print(str(s_a) + ', ' + str(s_b))
+            outcome_a = self.is_over((s_a + 1, s_b), self.goal, self.lead, self.golden, self.best_of)
+            outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
+            #print('Outcome: ' + str(outcome_a) + ' state: ' + str((s_a +1,s_b)))
+            #print('Outcome: ' + str(outcome_b) + ' state: ' + str((s_a ,s_b +1)))
+
+            self.calculate_next_index(outcome_a, (s_a+1, s_b), i, available_indexes, self.wp)
+            self.calculate_next_index(outcome_b, (s_a, s_b+1), i, available_indexes, self.lp)
+
+        return self.index_to_state, self.state_to_index
+
+    def calculate_next_index(self, outcome, state, cur_index, available_indexes, p):
+        # No won on outcome. There will be complications here
+        if outcome == 0:
+          # Check if state has already been populated
+            if state not in self.index_to_state.values():
+              # Available index will be reduced in size
+                next_index                             = available_indexes.pop(0) 
+                self.index_to_state[next_index]        = state
+                self.state_to_index[state]             = next_index
+            else:
+                next_index = self.state_to_index[state]
+        elif outcome == 1 or outcome == 3:
+            if outcome == 3: # Skeleton implementation for golden point stat
+                pass
+        elif outcome == -1 or outcome == -3:
+            if outcome == -3:
+                pass
+        # Check if advantage state has been created for this specific advantage
+        if outcome == 2 or outcome == -2:
+            # Calculates advantage
+            s_a, s_b        = state
+            advantage       = s_a - s_b
+            advantage_state = ('adv',advantage)
+  
+            # Check if we have already visited this state
+            if advantage_state not in self.states_populated:
+                next_index = available_indexes.pop(0)
+                self.index_to_state[next_index] = advantage_state
+                self.state_to_index[advantage]  = next_index
+            else:
+                next_index = self.state_to_index[advantage_state]
+
     '''
         Positive values: winner a
         Negative values: winner b
@@ -145,7 +204,7 @@ class GameLevel:
         0 : no win
         1 : winner a
         2 : winner a within lead
-        3 : winner a golden point
+       3 : winner a golden point
     '''
     @staticmethod
     def is_over(state, goal, lead, golden, best_of):
@@ -154,11 +213,13 @@ class GameLevel:
         # First check: best of has been reached
         if best_of is not None:
             win_best_of_a = s_a >= math.ceil(best_of / 2)
-            win_best_of_b = s_a >= math.ceil(best_of / 2)
+            win_best_of_b = s_b >= math.ceil(best_of / 2)
             if win_best_of_a:
                 return 1
             if win_best_of_b:
                 return -1
+            return 0 # Best of winning score has not been reached by any player
+
         # Second check: golden point has been reached
         reached_golden_a = s_a >= golden
         reached_golden_b = s_b >= golden
