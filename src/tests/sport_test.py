@@ -175,7 +175,11 @@ class SportTest(unittest.TestCase):
     #### Generating transition matrixes ###
 
     def test_transition_matrix_single_level(self):
-        pass
+        s = sp.Sport()
+        s.add_hierarchy_level(goal=3)
+        t_m       = s.compute_transition_matrix()
+        real_t_m  = self.get_transition_matrix_single_level()
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_double_level(self):
         s = sp.Sport()
@@ -183,11 +187,32 @@ class SportTest(unittest.TestCase):
         s.add_hierarchy_level(goal=2)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_transition_matrix_double_level()
-        print(real_t_m)
-        print()
-        print(t_m)
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
+    def get_transition_matrix_single_level(self):
+        win = 9
+        lose = 10
+        wp, lp = 1,-1
+        transition_matrix = np.zeros((9,11))
+        transition_matrix[0][1] = wp
+        transition_matrix[0][2] = lp
+        transition_matrix[1][3] = wp
+        transition_matrix[1][4] = lp
+        transition_matrix[2][4] = wp
+        transition_matrix[2][5] = lp
+        transition_matrix[3][win] = wp
+        transition_matrix[3][6] = lp
+        transition_matrix[4][6] = wp
+        transition_matrix[4][7] = lp
+        transition_matrix[5][7] = wp
+        transition_matrix[5][lose] = lp
+        transition_matrix[6][win] = wp
+        transition_matrix[6][8] = lp
+        transition_matrix[7][8] = wp
+        transition_matrix[7][lose] = lp
+        transition_matrix[8][win] = wp
+        transition_matrix[8][lose] = lp
+        return transition_matrix
 
     def get_transition_matrix_double_level(self):
         win = 16
@@ -227,7 +252,5 @@ class SportTest(unittest.TestCase):
         transition_matrix[15][win] = wp
         transition_matrix[15][lose] = lp
         return transition_matrix
+
     #### Running simulations ###
-
-
-
