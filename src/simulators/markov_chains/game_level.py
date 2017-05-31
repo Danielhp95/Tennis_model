@@ -43,7 +43,6 @@ class GameLevel:
         self.win_index  = win_index
         self.lose_index = lose_index
 
-        # TODO: refactor into own function
         # if lead advantage is set and golden point is not set, start by populating adv states
         if self.golden == float('inf') and self.lead > 0:
             adv_states        = valid_indexes[self.goal**2:]
@@ -82,71 +81,21 @@ class GameLevel:
             outcome_a = self.is_over((s_a + 1, s_b), self.goal, self.lead, self.golden, self.best_of)
             outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
 
-            win_index  = self.mark_outcome(outcome_a, (s_a+1, s_b),
-                    i, available_indexes, matrix, self.wp)
-            lose_index = self.mark_outcome(outcome_b, (s_a, s_b+1), i,
-                    available_indexes, matrix, self.lp)
             self.index_connections[i] = (win_index, lose_index)
 
         # The part of the matrix corresponding to this part of the game must be filled by now
         # There must be no available indexes left
         assert len(available_indexes) == 0
 
-
-    def mark_outcome(self, outcome, state, cur_index, available_indexes, transition_matrix, p):
-        # No won on outcome. There will be complications here
-        if outcome == 0:
-            # Check if state has already been populated
-            if state not in self.states_populated.keys():
-                # Available index will be reduced in size
-                next_index                               = available_indexes.pop(0) 
-                self.states_populated[next_index]        = state
-                self.states_populated[state]             = next_index
-            else:
-                next_index = self.states_populated[state]
-            transition_matrix[cur_index][next_index] = p
-            return next_index
-        elif outcome == 1 or outcome == 3:
-            transition_matrix[cur_index][self.win_index]  = p
-            if outcome == 3: # Skeleton implementation for golden point stat
-                pass
-            return self.win_index
-        elif outcome == -1 or outcome == -3:
-            transition_matrix[cur_index][self.lose_index] = p
-            if outcome == -3:
-                pass
-            return self.lose_index
-        # Check if advantage state has been created for this specific advantage
-        # Will probabily need to change for golden point implementation
-        if outcome == 2 or outcome == -2:
-            s_a, s_b        = state
-            advantage       = s_a - s_b
-            advantage_state = ('adv',advantage)
-
-            # Check if we have already visited this state
-            if advantage_state not in self.states_populated:
-                next_index = available_indexes.pop(0)
-                self.states_populated[advantage]  = next_index
-                self.states_populated[next_index] = advantage_state
-            else:
-                next_index = self.states_populated[advantage_state]
-                transition_matrix[cur_index][next_index] = p
-            transition_matrix[cur_index][next_index] = p
-            return next_index
-
-    # TODO: add lead advantage
     def calculate_states_from_indexes(self, number_of_transient_states, valid_indexes):
         # Initialize state population
         initial_index = valid_indexes[0]
         initial_state = (0,0)
-        self.st_to_in = {}
-        self.in_to_st = {}
         self.index_to_state[initial_index] = (0,0)
         self.state_to_index[initial_state] = initial_index
 
-        # Indexes outside current game level
-        #self.win_index   = win_index
-        #self.lose_index  = lose_index
+        if self.golden == float('inf') and self.lead > 0:
+            valid_indexes = self.add_lead_indexes(valid_indexes,)
 
         available_indexes = valid_indexes[1:]
         for i in valid_indexes:
@@ -162,6 +111,28 @@ class GameLevel:
             self.calculate_next_index(outcome_b, (s_a, s_b+1), i, available_indexes, self.lp)
 
         return self.index_to_state, self.state_to_index
+
+    def add_lead_indexes(self, valid_indexes):
+        adv_states        = valid_indexes[self.goal**2:]
+        valid_indexes     = valid_indexes[:self.goal**2]
+        advantage = 1
+        assert len(adv_states) % 2 == 0
+        while len(adv_states) > 0 and advantage < self.lead:
+            a_adv, b_adv = adv_states.pop(0), adv_states.pop(0)
+           # This code may be unnecessary
+           #a_win_index, a_lose_index = a_adv + 2, a_adv - 2
+           #b_win_index, b_lose_index = b_adv - 2, b_adv + 2
+           #if advantage == 1:
+           #    a_lose_index = a_adv - 1
+           #if advantage == self.lead - 1:
+           #    a_win_index  = win_index
+           #    b_lose_index = lose_index
+            self.index_to_state[a_adv] = ('adv', advantage)
+            self.state_to_index[('adv',advantage)]  = a_adv
+            self.index_to_state[b_adv] = ('adv', -advantage)
+            self.state_to_index[('adv',-advantage)] = b_adv
+            advantage += 1
+        return valid_indexes
 
     def calculate_next_index(self, outcome, state, cur_index, available_indexes, p):
         # No won on outcome. There will be complications here
@@ -188,7 +159,7 @@ class GameLevel:
             advantage_state = ('adv',advantage)
   
             # Check if we have already visited this state
-            if advantage_state not in self.states_populated:
+            if advantage_state not in self.state_to_index:
                 next_index = available_indexes.pop(0)
                 self.index_to_state[next_index] = advantage_state
                 self.state_to_index[advantage]  = next_index

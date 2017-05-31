@@ -24,9 +24,6 @@ class Sport:
 
         # The actual transition matrix that defines the markov chain
         transition_matrix = self.initialize_transition_matrix(total_level_states[0]) 
-        print(isolated_level_states)
-        print(total_level_states)
-        print(transition_matrix.shape)
         # Last most two indexes will be used as columns for the absorbing states
         absorbing_win_index  = total_level_states[0] 
         absorbing_lose_index = total_level_states[0] + 1
@@ -102,11 +99,26 @@ class Sport:
         next_win_state = state[:]
         for i in range(len(state)-1,-1,-1):
             s_a, s_b = state[i]
+            level_goal, level_lead, _, _ = self.level_rules[i]
+            # We are inside a deuce
+            if s_a == 'adv':
+                if s_b < level_lead - 1:
+                    new_advantage = s_b + 1
+                    next_win_state[i] = ('adv',new_advantage) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                    return next_win_state
+                else:
+                    next_win_state[i] = (0,0)
+                    continue
+
             outcome  = gl.GameLevel.is_over((s_a + 1, s_b),*self.level_rules[i])
-            if outcome == 0 or outcome == 2:
+            if outcome == 0:
                 # We don't move from current game level
                 next_win_state[i] = (s_a+1,s_b)
                 return next_win_state 
+            if outcome == 2: # No need to worry about Best_of because lead and best_of are mutually exclusive
+                advantage = (s_a + 1) - s_b
+                next_win_state[i] = ('adv', advantage) if advantage != 0 else (level_goal -1, level_goal-1)
+                return next_win_state
             if outcome == 1 or outcome == 3:
                 # We move to next game level. We reset this level
                 next_win_state[i] = (0,0)
@@ -118,11 +130,26 @@ class Sport:
         next_lose_state = state[:]
         for i in range(len(state)-1,-1,-1):
             s_a, s_b = state[i]
+            level_goal, level_lead, _, _ = self.level_rules[i]
+            # We are inside a deuce
+            if s_a == 'adv':
+                if s_b > -1*(level_lead - 1):
+                    new_advantage = s_b - 1
+                    next_lose_state[i] = ('adv',new_advantage) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                    return next_lose_state
+                else:
+                    next_lose_state[i] = (0,0)
+                    continue
+
             outcome  = gl.GameLevel.is_over((s_a, s_b+1),*self.level_rules[i])
-            if outcome == 0 or outcome == -2:
+            if outcome == 0:
                 # We don't move from current game level
                 next_lose_state[i] = (s_a,s_b+1)
                 return next_lose_state 
+            if outcome == -2: # No need to worry about Best_of because lead and best_of are mutually exclusive
+                advantage = s_a - (s_b + 1)
+                next_lose_state[i] = ('adv', advantage) if advantage != 0 else (level_goal -1, level_goal-1)
+                return next_lose_state
             if outcome == -1 or outcome == -3:
                 # We move to next game level. We reset this level
                 next_lose_state[i] = (0,0)
@@ -141,7 +168,6 @@ class Sport:
         lower_states  = [(0,0)] * (len(valid_indexes) - (cur_level + 1))
         current_absolute_state = higher_states + [rel_st] + lower_states
         return current_absolute_state
-
 
     def aggregated_level_size(self, x):
         return [reduce(lambda x,y: x*y, x[i:]) for i in range(0,len(x))] # What an obscure and beautiful line of code

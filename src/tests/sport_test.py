@@ -147,6 +147,28 @@ class SportTest(unittest.TestCase):
         self.assert_win_state_equals(state=[(1,1),(3,3)], expected=[(2,1),(0,0)],sport=s)
         self.assert_win_state_equals(state=[(3,3),(3,0)], expected=['win'],sport=s)
 
+    def test_next_win_state_lead(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(best_of=5)
+        s.add_hierarchy_level(goal=4,lead=3)
+        self.assert_win_state_equals(state=[(0,0),('adv',1)], expected=[(0,0),('adv',2)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',2)], expected=[(1,0),(0,0)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',1)],sport=s) 
+        self.assert_win_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',2)],sport=s) 
+        self.assert_win_state_equals(state=[(0,0),('adv',-1)], expected=[(0,0),(3,3)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',-2)], expected=[(0,0),('adv',-1)],sport=s)
+
+    def test_next_lose_state_lead(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(best_of=5)
+        s.add_hierarchy_level(goal=4,lead=3)
+        self.assert_lose_state_equals(state=[(0,0),('adv',-1)], expected=[(0,0),('adv',-2)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',-2)], expected=[(0,1),(0,0)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',-1)],sport=s) 
+        self.assert_lose_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',-2)],sport=s) 
+        self.assert_lose_state_equals(state=[(0,0),('adv',1)], expected=[(0,0),(3,3)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',2)], expected=[(0,0),('adv',1)],sport=s)
+
     def test_next_lose_state(self):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=5)
@@ -159,17 +181,9 @@ class SportTest(unittest.TestCase):
         self.assert_lose_state_equals(state=[(3,3),(0,3)], expected=['lose'],sport=s)
 
     def assert_win_state_equals(self, state=None, expected=None, sport=None):
-        iso = sport.isolated_level_size()
-        tot = sport.aggregated_level_size(iso)
-        valid_indexes = sport.generate_all_valid_indexes(iso, tot)
-        abs_index_to_states = sport.calculate_all_absolute_states(valid_indexes, iso, tot)
         assert expected == sport.calculate_next_win_state(state)
 
     def assert_lose_state_equals(self, state=None, expected=None, sport=None):
-        iso = sport.isolated_level_size()
-        tot = sport.aggregated_level_size(iso)
-        valid_indexes = sport.generate_all_valid_indexes(iso, tot)
-        abs_index_to_states = sport.calculate_all_absolute_states(valid_indexes, iso, tot)
         assert expected == sport.calculate_next_lose_state(state)
 
     #### Generating transition matrixes ###
@@ -187,6 +201,30 @@ class SportTest(unittest.TestCase):
         s.add_hierarchy_level(goal=2)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_transition_matrix_double_level()
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def test_transition_matrix_lead(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(goal=3, lead=2)
+        t_m       = s.compute_transition_matrix()
+        real_t_m  = self.get_trans_matrix_lead_2()
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def test_transition_matrix_lead_golden(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(goal=4, lead=2, golden=6)
+        t_m       = s.compute_transition_matrix()
+        real_t_m  = self.get_trans_matrix_lead_golden()
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def test_transition_matrix_lead_golden_multiple_level(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(best_of=3)
+        s.add_hierarchy_level(goal=4, lead=3, golden=5)
+        t_m       = s.compute_transition_matrix()
+        real_t_m  = self.get_trans_matrix_lead_golden_multiple_level()
+        print(t_m)
+        print(real_t_m)
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def get_transition_matrix_single_level(self):
@@ -253,4 +291,295 @@ class SportTest(unittest.TestCase):
         transition_matrix[15][lose] = lp
         return transition_matrix
 
+    def create_trans_matrix_only_goal(self, wp, lp):
+        # goal=3, lead=0
+        win_index = 9
+        lose_index = 10
+        trans_m = np.zeros((9,11))
+        trans_m[0][1] = wp
+        trans_m[0][2] = lp
+        trans_m[1][3] = wp
+        trans_m[1][4] = lp
+        trans_m[2][4] = wp
+        trans_m[2][5] = lp
+        trans_m[3][win_index] = wp
+        trans_m[3][6] = lp
+        trans_m[4][6] = wp
+        trans_m[4][7] = lp
+        trans_m[5][7] = wp
+        trans_m[5][lose_index] = lp
+        trans_m[6][win_index] = wp
+        trans_m[6][8] = lp
+        trans_m[7][8] = wp
+        trans_m[7][lose_index] = lp
+        trans_m[8][win_index] = wp
+        trans_m[8][lose_index] = lp
+        return trans_m
+
+    def get_trans_matrix_lead_2(self):
+        # goal=3, lead=2
+        win_index = 11
+        lose_index = 12
+        wp = 1
+        lp = -1
+        trans_m = np.zeros((11,13))
+        trans_m[0][1] = wp
+        trans_m[0][2] = lp
+        trans_m[1][3] = wp
+        trans_m[1][4] = lp
+        trans_m[2][4] = wp
+        trans_m[2][5] = lp
+        trans_m[3][win_index] = wp
+        trans_m[3][6] = lp
+        trans_m[4][6] = wp
+        trans_m[4][7] = lp
+        trans_m[5][7] = wp
+        trans_m[5][lose_index] = lp
+        trans_m[6][win_index] = wp
+        trans_m[6][8] = lp
+        trans_m[7][8] = wp
+        trans_m[7][lose_index] = lp
+        trans_m[8][9] = wp
+        trans_m[8][10] = lp
+        trans_m[9][win_index] = wp
+        trans_m[9][8] = lp
+        trans_m[10][8] = wp
+        trans_m[10][lose_index] = lp
+        return trans_m
+    
+    def get_trans_matrix_lead_golden(self):
+        # goal = 4, lead= 2, golden = 6
+        win_index = 22
+        lose_index = 23
+        trans_m = np.zeros((22,24))
+        wp = 1
+        lp = -1
+
+        trans_m[0][1] = wp
+        trans_m[0][2] = lp
+        trans_m[1][3] = wp
+        trans_m[1][4] = lp
+        trans_m[2][4] = wp
+        trans_m[2][5] = lp
+        trans_m[3][6] = wp
+        trans_m[3][7] = lp
+        trans_m[4][7] = wp
+        trans_m[4][8] = lp
+        trans_m[5][8] = wp
+        trans_m[5][9] = lp
+        trans_m[6][win_index] = wp
+        trans_m[6][10] = lp
+        trans_m[7][10] = wp
+        trans_m[7][11] = lp
+        trans_m[8][11] = wp
+        trans_m[8][12] = lp
+        trans_m[9][12] = wp
+        trans_m[9][lose_index] = lp
+        trans_m[10][win_index] = wp
+        trans_m[10][13] = lp
+        trans_m[11][13] = wp
+        trans_m[11][14] = lp
+        trans_m[12][14] = wp
+        trans_m[12][lose_index] = lp
+        trans_m[13][win_index] = wp
+        trans_m[13][15] = lp
+        trans_m[14][15] = wp
+        trans_m[14][lose_index] = lp
+        trans_m[15][16] = wp
+        trans_m[15][17] = lp
+        trans_m[16][win_index] = wp
+        trans_m[16][18] = lp
+        trans_m[17][18] = wp
+        trans_m[17][lose_index] = lp
+        trans_m[18][19] = wp
+        trans_m[18][20] = lp
+        trans_m[19][win_index] = wp
+        trans_m[19][21] = lp
+        trans_m[20][21] = wp
+        trans_m[20][lose_index] = lp
+        trans_m[21][win_index] = wp
+        trans_m[21][lose_index] = lp
+        return trans_m
     #### Running simulations ###
+
+    def get_trans_matrix_lead_golden_multiple_level(self):
+        # best_of = 4
+        # goal = 4, lead= 3, golden = 5
+        win_index = 84
+        lose_index = 85
+        trans_m = np.zeros((84,86))
+        wp = 1
+        lp = -1
+    
+        trans_m[0][1] = wp
+        trans_m[0][2] = lp
+        trans_m[1][3] = wp
+        trans_m[1][4] = lp
+        trans_m[2][4] = wp
+        trans_m[2][5] = lp
+        trans_m[3][6] = wp
+        trans_m[3][7] = lp
+        trans_m[4][7] = wp
+        trans_m[4][8] = lp
+        trans_m[5][8] = wp
+        trans_m[5][9] = lp
+        trans_m[6][21] = wp
+        trans_m[6][10] = lp
+        trans_m[7][10] = wp
+        trans_m[7][11] = lp
+        trans_m[8][11] = wp
+        trans_m[8][12] = lp
+        trans_m[9][12] = wp
+        trans_m[9][42] = lp
+        trans_m[10][21] = wp
+        trans_m[10][13] = lp
+        trans_m[11][13] = wp
+        trans_m[11][14] = lp
+        trans_m[12][14] = wp
+        trans_m[12][42] = lp
+        trans_m[13][15] = wp
+        trans_m[13][16] = lp
+        trans_m[14][16] = wp
+        trans_m[14][17] = lp
+        trans_m[15][21] = wp
+        trans_m[15][18] = lp
+        trans_m[16][18] = wp
+        trans_m[16][19] = lp
+        trans_m[17][19] = wp
+        trans_m[17][42] = lp
+        trans_m[18][21] = wp
+        trans_m[18][20] = lp
+        trans_m[19][20] = wp
+        trans_m[19][42] = lp
+        trans_m[20][21] = wp
+        trans_m[20][42] = lp
+
+        trans_m[21][22] = wp
+        trans_m[21][23] = lp
+        trans_m[22][24] = wp
+        trans_m[22][25] = lp
+        trans_m[23][25] = wp
+        trans_m[23][26] = lp
+        trans_m[24][27] = wp
+        trans_m[24][28] = lp
+        trans_m[25][28] = wp
+        trans_m[25][29] = lp
+        trans_m[26][29] = wp
+        trans_m[26][30] = lp
+        trans_m[27][win_index] = wp
+        trans_m[27][31] = lp
+        trans_m[28][31] = wp
+        trans_m[28][32] = lp
+        trans_m[29][32] = wp
+        trans_m[29][33] = lp
+        trans_m[30][33] = wp
+        trans_m[30][63] = lp
+        trans_m[31][win_index] = wp
+        trans_m[31][34] = lp
+        trans_m[32][34] = wp
+        trans_m[32][35] = lp
+        trans_m[33][35] = wp
+        trans_m[33][63] = lp
+        trans_m[34][36] = wp
+        trans_m[34][37] = lp
+        trans_m[35][37] = wp
+        trans_m[35][38] = lp
+        trans_m[36][win_index] = wp
+        trans_m[36][39] = lp
+        trans_m[37][39] = wp
+        trans_m[37][40] = lp
+        trans_m[38][40] = wp
+        trans_m[38][63] = lp
+        trans_m[39][win_index] = wp
+        trans_m[39][41] = lp
+        trans_m[40][41] = wp
+        trans_m[40][63] = lp
+        trans_m[41][win_index] = wp
+        trans_m[41][63] = lp
+        
+        trans_m[42][43] = wp
+        trans_m[42][44] = lp
+        trans_m[43][45] = wp
+        trans_m[43][46] = lp
+        trans_m[44][46] = wp
+        trans_m[44][47] = lp
+        trans_m[45][48] = wp
+        trans_m[45][49] = lp
+        trans_m[46][49] = wp
+        trans_m[46][50] = lp
+        trans_m[47][50] = wp
+        trans_m[47][51] = lp
+        trans_m[48][63] = wp
+        trans_m[48][52] = lp
+        trans_m[49][52] = wp
+        trans_m[49][53] = lp
+        trans_m[50][53] = wp
+        trans_m[50][54] = lp
+        trans_m[51][54] = wp
+        trans_m[51][lose_index] = lp
+        trans_m[52][63] = wp
+        trans_m[52][55] = lp
+        trans_m[53][55] = wp
+        trans_m[53][56] = lp
+        trans_m[54][56] = wp
+        trans_m[54][lose_index] = lp
+        trans_m[55][57] = wp
+        trans_m[55][58] = lp
+        trans_m[56][58] = wp
+        trans_m[56][59] = lp
+        trans_m[57][63] = wp
+        trans_m[57][60] = lp
+        trans_m[58][60] = wp
+        trans_m[58][61] = lp
+        trans_m[59][61] = wp
+        trans_m[59][lose_index] = lp
+        trans_m[60][63] = wp
+        trans_m[60][62] = lp
+        trans_m[61][62] = wp
+        trans_m[61][lose_index] = lp
+        trans_m[62][63] = wp
+        trans_m[62][lose_index] = lp
+
+        trans_m[63][64] = wp
+        trans_m[63][65] = lp
+        trans_m[64][66] = wp
+        trans_m[64][67] = lp
+        trans_m[65][67] = wp
+        trans_m[65][68] = lp
+        trans_m[66][69] = wp
+        trans_m[66][70] = lp
+        trans_m[67][70] = wp
+        trans_m[67][71] = lp
+        trans_m[68][71] = wp
+        trans_m[68][72] = lp
+        trans_m[69][win_index] = wp
+        trans_m[69][73] = lp
+        trans_m[70][73] = wp
+        trans_m[70][74] = lp
+        trans_m[71][74] = wp
+        trans_m[71][75] = lp
+        trans_m[72][75] = wp
+        trans_m[72][lose_index] = lp
+        trans_m[73][win_index] = wp
+        trans_m[73][76] = lp
+        trans_m[74][76] = wp
+        trans_m[74][77] = lp
+        trans_m[75][77] = wp
+        trans_m[75][lose_index] = lp
+        trans_m[76][78] = wp
+        trans_m[76][79] = lp
+        trans_m[77][79] = wp
+        trans_m[77][80] = lp
+        trans_m[78][win_index] = wp
+        trans_m[78][81] = lp
+        trans_m[79][81] = wp
+        trans_m[79][82] = lp
+        trans_m[80][82] = wp
+        trans_m[80][lose_index] = lp
+        trans_m[81][win_index] = wp
+        trans_m[81][83] = lp
+        trans_m[82][83] = wp
+        trans_m[82][lose_index] = lp
+        trans_m[83][win_index] = wp
+        trans_m[83][lose_index] = lp
+        return trans_m
