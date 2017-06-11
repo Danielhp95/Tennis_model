@@ -38,8 +38,25 @@ class betting_run_test(unittest.TestCase):
                                      rank_points=rank_points,
                                      model=mo, strategy=strat)
 
+        for i, r in btr.atp_bet.iterrows():
+            assert r['Surface'] == 'Hard'
         assert len(btr.atp_matches) > len(btr.atp_bet)
-        
+
+    def test_can_filter_on_court(self):
+        initial_money = 1
+        mo         = md.FiftyFiftyModel()
+        strat      = st.BetOnLoserStrategy()
+
+        earliest_year = 2007
+        latest_year   = 2007
+        courts = ['Grass']
+        btr = betting_run.BettingRun(initial_money=initial_money,
+                                     earliest_year=earliest_year, latest_year=latest_year,
+                                     courts=courts, model=mo, strategy=strat)
+
+        for i, r in btr.atp_bet.iterrows():
+            assert r['Surface'] == 'Grass'
+
     def test_calculate_match_odds(self):
         btr = self.create_betting_run(st.RecordDatesStrategy, md.FiftyFiftyModel)
         match_odds = pd.DataFrame(zip([1],[1]), columns=['B365W','B365L'])

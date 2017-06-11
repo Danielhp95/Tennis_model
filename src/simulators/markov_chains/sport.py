@@ -35,22 +35,26 @@ class Sport:
         # score for a game level in the hierarchy.
         abs_in_to_st = self.calculate_all_absolute_states(all_valid_indexes, isolated_level_states, total_level_states)
         abs_st_to_in = {tuple(v) : k for k, v in abs_in_to_st.iteritems()} # Reverses dictionary
+
+        # Add both absorbing states to dictionary containing 
+        # a mapping between absolute states and their corresponding indexes
         abs_st_to_in[('win',)]  = absorbing_win_index
         abs_st_to_in[('lose',)] = absorbing_lose_index
-        print(abs_st_to_in)
 
         # Calculate where each state will lead to upon winning or losing a point
         index_conections = {index : (self.calculate_next_win_state(st),self.calculate_next_lose_state(st)) for index, st in abs_in_to_st.items()}
         # Transform value states into indexes 
         index_conections = {index : (abs_st_to_in[tuple(win_s)], abs_st_to_in[tuple(los_s)]) for index, (win_s, los_s) in index_conections.items()}
-        print(index_conections)
 
-        # Populate transition probabilities
-        for i in range(0, len(transition_matrix)):
-            win_i = index_conections[i][0] if index_conections[i][0] != 'win' else absorbing_win_index
-            los_i = index_conections[i][1] if index_conections[i][1] != 'lose' else absorbing_lose_index
-            transition_matrix[i,win_i] = 1
-            transition_matrix[i,los_i] = -1
+        # Having calculated which entries in the matrix will need to be populated with some transition probability.
+        # The final step is to decide the value of all transition probabilities.
+        # This is done by using serve propagation rules.
+
+        transition_matrix = self.propagate_serve_rules(transition_matrix, 
+                                                       abs_st_to_in, abs_in_to_st,
+                                                       index_conections,
+                                                       isolated_level_states, 
+                                                       total_level_states)
 
         return transition_matrix
 
@@ -168,6 +172,14 @@ class Sport:
         lower_states  = [(0,0)] * (len(valid_indexes) - (cur_level + 1))
         current_absolute_state = higher_states + [rel_st] + lower_states
         return current_absolute_state
+
+    def propagate_serve_rules(self, transition_matrix, abs_st_to_in, abs_in_to_st, index_conections, isolated_level_states, total_level_states):
+        for i in range(0, len(transition_matrix)):
+            win_i = index_conections[i][0] if index_conections[i][0] != 'win' else absorbing_win_index
+            los_i = index_conections[i][1] if index_conections[i][1] != 'lose' else absorbing_lose_index
+            transition_matrix[i,win_i] = 1
+            transition_matrix[i,los_i] = -1
+        return transition_matrix
 
     def aggregated_level_size(self, x):
         return [reduce(lambda x,y: x*y, x[i:]) for i in range(0,len(x))] # What an obscure and beautiful line of code

@@ -56,7 +56,6 @@ class BettingRun(object):
         self.dirty_run = dirty_run
         
 
-
     def gather_data(self, earliest_year, latest_year):
         return dec.read_by_date(earliest_year, latest_year)
 
@@ -86,6 +85,14 @@ class BettingRun(object):
         if rank_points is not None:
             filter_atp = betdao.filter_by_rank_points(filter_atp, rank_points)
             filter_wta = betdao.filter_by_rank_points(filter_wta, rank_points)
+        if courts is not None:
+            print(len(filter_atp))
+            filter_atp = atpdao.filter_by_court(filter_atp, courts)
+            print(len(filter_atp))
+            for i, r in filter_atp.iterrows():
+                assert r['Surface'] == 'Grass'
+                
+            filter_wta = atpdao.filter_by_court(filter_wta, courts)
         return filter_atp, filter_wta
 
 
@@ -97,7 +104,6 @@ class BettingRun(object):
             matches = self.wta_matches
             filtered_matches  = self.wta_bet.sort(['Date'],ascending=1)
 
-        # Betting run for ATP league
         run_money = self.initial_money
         for i, match in filtered_matches.iterrows():
             if self.dirty_run:
