@@ -2,6 +2,11 @@ import os
 import shutil
 from subprocess import call
 
+"""
+    Script used to download all data regarding betting information from WEBSITE.
+    This script will populate the directory on which it is run with .xls and .xlsx files
+    containing betting information from 2006 onwards.
+"""
 
 WEBSITE = 'http://tennis-data.co.uk/alldata.php'
 
