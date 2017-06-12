@@ -1,2 +1,0 @@
-#!/bin/sh
-g++ -std=c++11 match.cpp set.cpp normal.cpp tennis-sim.cpp -o tennis-sim

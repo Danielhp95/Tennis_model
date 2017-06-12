@@ -11,3 +11,7 @@ printtodos
 
 # Ignoring hidden directories
 .*
+
+# Ignore folders created by setuptools
+dist/
+*.egg-info/
