@@ -1,12 +1,18 @@
 
 # A strategy always returns the amount of money being bet on the match
-def strategy(model_odds_player_a, model_odds_player_b, average_betting_exchange_odds_a, average_betting_exchange_odds_b, bet=1):
-    odds_difference_a = model_odds_player_a - average_betting_exchange_odds_a
-    odds_difference_b = model_odds_player_b - average_betting_exchange_odds_b
-  
-    if odds_difference_a > 0 and odds_difference_a > odds_difference_b:
-        return bet, 'a'
-    elif odds_difference_b > 0 and odds_difference_b > odds_difference_b:
-        return bet, 'b'
-    else:
-        return 0
+"""
+    Strategy documentation
+"""
+
+class BetIfBetterOddsForPredictedWinnerStrategy(object):
+
+    def strategy(self, model_odds_player_a, model_odds_player_b,
+                 average_betting_exchange_odds_a, average_betting_exchange_odds_b,
+                 *args):
+        if model_odds_player_a >= model_odds_player_b:
+            if average_betting_exchange_odds_a > model_odds_player_a:
+                return 1,'a'
+        else:
+            if average_betting_exchange_odds_b > model_odds_player_b:
+                return 1,'b'
+        return 0, 'a'
