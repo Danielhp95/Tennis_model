@@ -1,4 +1,0 @@
-
-recursive-include tennis_model *.py
-recursive-include tennis_model *.csv *.xls *xlsx
-

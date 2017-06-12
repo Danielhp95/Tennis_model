@@ -1,13 +1,15 @@
+from setuptools import find_packages
 from setuptools import setup
 
 setup(name='tennis_model',
-      version='0.1',
+      version='0.1.5',
       description='Framework for sport modelling',
       url='http://github.com/danielhp95/Tennis_model',
       author='Daniel Hernandez',
       author_email='danielhp95@gmail.com',
       license='MIT',
-      packages=['tennis_model'],
+      include_package_data=True,
+      packages=find_packages(include=['tennis_model','tennis_model.*']),
       install_requires=[
         'appdirs==1.4.3',
         'coverage==4.3.4',
