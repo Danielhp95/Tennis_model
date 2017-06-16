@@ -2,7 +2,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(name='tennis_model',
-      version='0.1.5',
+      version='0.1.6',
       description='Framework for sport modelling',
       url='http://github.com/danielhp95/Tennis_model',
       author='Daniel Hernandez',

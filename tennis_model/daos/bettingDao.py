@@ -3,7 +3,7 @@ import pandas as pd
 from pandas import read_excel
 
 # women matches files are finished by a 'w'
-DATA_DIR     = os.path.abspath(os.path.join(__file__, '..', 'data', 'betting')) + '/'
+DATA_DIR     = os.path.abspath(os.path.join(__file__, '..', '..', 'data', 'betting')) + '/'
 CURRENT_YEAR = 2017
 
 def read_by_date(earliest, latest=CURRENT_YEAR, ignore_wtp=False):
