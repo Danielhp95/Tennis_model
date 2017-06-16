@@ -42,7 +42,6 @@ class BettingRun(object):
         assert latest_year <= betdao.CURRENT_YEAR, '{latest_year} must be less or equal than ' + betdao.CURRENT_YEAR
         assert getattr(strategy, 'strategy', None) is not None, '{strategy} must implement stragegy function'
 
-        self.total_bets    = 0
         self.initial_money = initial_money
         self.atp_matches, self.wta_matches = self.gather_data(earliest_year, latest_year)
         self.atp_bet, self.wta_bet   = self.apply_filters(self.atp_matches, self.wta_matches, courts, tournaments,
@@ -153,6 +152,8 @@ class BettingRun(object):
         return
 
     def initialize_statistics(self):
+        self.total_bets        = 0
+        self.successful_bets   = 0
         self.total_atp_matches = len(self.atp_bet)
         self.total_wta_matches = len(self.wta_bet)
         self.matches_statistics = {}
@@ -173,6 +174,7 @@ class BettingRun(object):
 
         roi = self.calculate_ROI(current_money + earnings, match)
         self.total_bets += 1 if bet != 0 else 0
+        self.successful_bets += 1 if player_bet == match['winner_name'] else 0
         
         self.matches_statistics[league].append((match,bet_run_match_stats))
 

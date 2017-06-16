@@ -7,7 +7,7 @@ from betting import betting_run
 
 import test_data.betting_strategies 
 sys.path.append(os.path.abspath(os.path.join('test_data','betting_strategies')))
-import strategies as st
+import test_strategies as st
 sys.path.append(os.path.abspath(os.path.join('test_data','betting_models')))
 import test_models as md
 
@@ -88,7 +88,6 @@ class betting_run_test(unittest.TestCase):
         btr.atp_matches = btr.atp_bet[100:200]
         btr.betting_run('ATP')
         num_matches = len(btr.atp_bet)
-        #TODO: change to equals when combine tables work
         assert btr.total_bets <= num_matches
 
     def test_statistics_never_bet(self):
@@ -100,6 +99,11 @@ class betting_run_test(unittest.TestCase):
         assert btr.atp_final_money == btr.initial_money
         assert btr.total_bets == 0
 
+    def test_statistics_successful_bets(self):
+        btr = self.create_betting_run(st.BetOnWinnerStrategy, md.FiftyFiftyModel)
+        btr.atp_matches = btr.atp_bet[100:200]
+        btr.betting_run('ATP')
+        assert btr.successful_bets == btr.total_bets
 
     def test_statistics_earnings(self):
         initial_money = 1
@@ -141,6 +145,7 @@ class betting_run_test(unittest.TestCase):
         btr.betting_run('ATP')
         for match, stats in btr.matches_statistics['ATP']:
             assert stats['model_odds'] == 1.0
+
 
     def test_dirty_run_can_go_negative_money(self):
         btr = self.create_betting_run(st.BetOnLoserStrategy, md.FiftyFiftyModel,dirty_run=True)
