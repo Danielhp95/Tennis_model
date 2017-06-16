@@ -16,5 +16,6 @@ class MarkovChainTest(unittest.TestCase):
         real_B = np.array([[0.75, 0.25],[0.5,0.5],[0.25,0.75]])
 
         calculated_B = mcu.calculate_absorption_probabilities(Q,I,R)
+        print(calculated_B)
         np.testing.assert_allclose(real_B, calculated_B, rtol=1e-1)
 

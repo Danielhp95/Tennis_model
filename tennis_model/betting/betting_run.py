@@ -172,7 +172,7 @@ class BettingRun(object):
         bet_run_match_stats['winner_betting_odds'] = winner_odds
         bet_run_match_stats['loser_betting_odds']  = loser_odds
 
-        roi = self.calculate_ROI(current_money + earnings, match)
+        roi = self.calculate_ROI(current_money + earnings)
         self.total_bets += 1 if bet != 0 else 0
         self.successful_bets += 1 if player_bet == match['winner_name'] else 0
         
@@ -181,8 +181,10 @@ class BettingRun(object):
     def finalize_statistics(self, final_money, league):
         if league == 'ATP':
             self.atp_final_money = final_money
+            self.atp_final_roi   = self.calculate_ROI(final_money)
         elif league == 'WTA':
             self.wta_final_money = final_money
+            self.wta_final_roi   = self.calculate_ROI(final_money)
 
     def filter_records_by_tournament(self, tournaments):
         return filter(lambda (m, st): m['tournament'] in tournaments,
@@ -196,7 +198,7 @@ class BettingRun(object):
         return filter(lambda (m, st): m['surface'] in surfaces,
                       self.matches_with_stats)
 
-    def calculate_ROI(self, current_money, match):
+    def calculate_ROI(self, current_money):
         return (current_money - self.initial_money) / self.initial_money
 
     def match_betting_odds(self, match):

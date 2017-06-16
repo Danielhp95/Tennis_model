@@ -1,4 +1,5 @@
 from  __future__ import division
+import markov_chain_utils as mcu
 import game_level as gl
 import numpy as np
 import math
@@ -21,12 +22,13 @@ class Sport:
         isolated_level_states = self.isolated_level_size()
         # State space that each unit of a level of the hierarchy requires
         total_level_states    = self.aggregated_level_size(isolated_level_states)
+        self.total_states = total_level_states[0]
 
         # The actual transition matrix that defines the markov chain
-        transition_matrix = self.initialize_transition_matrix(total_level_states[0]) 
+        transition_matrix = self.initialize_transition_matrix(self.total_states) 
         # Last most two indexes will be used as columns for the absorbing states
-        absorbing_win_index  = total_level_states[0] 
-        absorbing_lose_index = total_level_states[0] + 1
+        absorbing_win_index  = self.total_states
+        absorbing_lose_index = self.total_states + 1
 
         # These indexes will be used to determine where each game level is placed in final transition matrix
         all_valid_indexes = self.generate_all_valid_indexes(isolated_level_states, total_level_states)
@@ -61,6 +63,14 @@ class Sport:
     # TODO: Complete function
     def compute_winning_probability_for_sport(self, spw=[None, None]):
         transition_matrix = self.compute_transition_matrix() # May need to pass spw tp function
+        print(transition_matrix.shape)
+        Q = transition_matrix[:,:self.total_states]
+        print(Q.shape)
+        I = np.eye(self.total_states)
+        R = transition_matrix[:,self.total_states:]
+        print(R.shape)
+        player_win_probabilities = mcu.calculate_absorption_probabilities(Q,I,R)
+        return player_win_probabilities
         
 
     def initialize_transition_matrix(self, num_transient_states):
@@ -173,12 +183,13 @@ class Sport:
         current_absolute_state = higher_states + [rel_st] + lower_states
         return current_absolute_state
 
+    # PLEASE
     def propagate_serve_rules(self, transition_matrix, abs_st_to_in, abs_in_to_st, index_conections, isolated_level_states, total_level_states):
         for i in range(0, len(transition_matrix)):
             win_i = index_conections[i][0] if index_conections[i][0] != 'win' else absorbing_win_index
             los_i = index_conections[i][1] if index_conections[i][1] != 'lose' else absorbing_lose_index
-            transition_matrix[i,win_i] = 1
-            transition_matrix[i,los_i] = -1
+            transition_matrix[i,win_i] = 0.6
+            transition_matrix[i,los_i] = 0.4
         return transition_matrix
 
     def aggregated_level_size(self, x):
