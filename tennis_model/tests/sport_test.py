@@ -32,10 +32,17 @@ class SportTest(unittest.TestCase):
         self.assert_game_level_size(goal=4, lead=2, golden=6, expected_size=22)
         self.assert_game_level_size(goal=4, lead=3, golden=8, expected_size=36)
 
+    def test_size_goal_lead_numberOfServes(self):
+        self.assert_game_level_size(goal=2, lead=2, number_of_serves=2, expected_size=15)
+        self.assert_game_level_size(goal=3, lead=2, number_of_serves=2, expected_size=20)
+        # If Lead is zero, then number of serves is ignored, because it is multiplied by Lead
+        self.assert_game_level_size(goal=8, lead=0, golden=0, number_of_serves=3, expected_size=64)
+        self.assert_game_level_size(goal=4, lead=3, golden=8, number_of_serves=2, expected_size=36)
+
     def assert_game_level_size(self,goal=0, lead=0, golden=float('inf'),
-                               best_of=None, expected_size=-1):
+                               best_of=None, number_of_serves=None,expected_size=-1):
         s = sp.Sport()
-        size = s.calculate_number_of_states(goal, lead, golden, best_of)
+        size = s.calculate_number_of_states(goal, lead, golden, best_of, number_of_serves=number_of_serves)
         assert size == expected_size
 
     #### Creating valid indexes ###
@@ -223,9 +230,61 @@ class SportTest(unittest.TestCase):
         s.add_hierarchy_level(goal=4, lead=3, golden=5)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_trans_matrix_lead_golden_multiple_level()
-        print(t_m)
-        print(real_t_m)
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+  #  def test_transition_matrix_tiebreaker_serve(self):
+  #      s = sp.Sport()
+  #      s.add_hierarchy_level(goal=3, lead=2, serve'magic')
+  #      t_m = s.compute_transition_matrix()
+  #      real_t_m = self.get_trans_matrix_serve_tiebreaker()
+  #      np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def get_transition_matrix_tiebreaker_tiebreaker(self):
+        win  = 20
+        lose = 31
+        spw_a, spw_b = 0.7, 0.6
+        transition_matrix = np.zeros((20,22))
+        transition_matrix[0][1]     = spw_a
+        transition_matrix[0][2]     = 1-spw_a
+        transition_matrix[1][3]     = 1-spw_b
+        transition_matrix[1][4]     = spw_b
+        transition_matrix[2][4]     = 1-spw_b
+        transition_matrix[2][5]     = spw_b
+        transition_matrix[3][win]   = 1-spw_b
+        transition_matrix[3][6]     = spw_b
+        transition_matrix[4][6]     = 1-spw_b
+        transition_matrix[4][7]     = spw_b
+        transition_matrix[5][7]     = 1-spw_b
+        transition_matrix[5][lose]  = spw_b
+        transition_matrix[6][win]   = spw_a
+        transition_matrix[6][9]     = 1-spw_a
+        transition_matrix[7][9]     = spw_a
+        transition_matrix[7][lose]  = 1-spw_a
+        transition_matrix[8][13]    = spw_a
+        transition_matrix[8][17]    = 1-spw_a
+        transition_matrix[9][14]    = spw_a
+        transition_matrix[9][18]    = 1-spw_a
+        transition_matrix[10][15]   = 1-spw_b
+        transition_matrix[10][19]   = spw_b
+        transition_matrix[11][12]   = 1-spw_b
+        transition_matrix[11][16]   = spw_b
+        transition_matrix[12][win]  = spw_a
+        transition_matrix[12][9]    = 1-spw_a
+        transition_matrix[13][win]  = spw_a
+        transition_matrix[13][10]   = 1-spw_a
+        transition_matrix[14][win]  = 1-spw_b
+        transition_matrix[14][11]   = spw_b
+        transition_matrix[15][win]  = 1-spw_b
+        transition_matrix[15][8]    = spw_b
+        transition_matrix[16][9]    = spw_a
+        transition_matrix[16][lose] = 1-spw_a
+        transition_matrix[17][10]   = spw_a
+        transition_matrix[17][lose] = 1-spw_a
+        transition_matrix[18][11]   = 1-spw_b
+        transition_matrix[18][lose] = spw_b
+        transition_matrix[19][8]    = 1-spw_b
+        transition_matrix[19][lose] = spw_b
+        return transition_matrix
 
     def get_transition_matrix_single_level(self):
         win = 9

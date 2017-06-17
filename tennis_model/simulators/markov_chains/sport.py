@@ -61,14 +61,11 @@ class Sport:
         return transition_matrix
 
     # TODO: Complete function
-    def compute_winning_probability_for_sport(self, spw=[None, None]):
+    def compute_winning_probabilities(self, spw=[None, None]):
         transition_matrix = self.compute_transition_matrix() # May need to pass spw tp function
-        print(transition_matrix.shape)
         Q = transition_matrix[:,:self.total_states]
-        print(Q.shape)
         I = np.eye(self.total_states)
         R = transition_matrix[:,self.total_states:]
-        print(R.shape)
         player_win_probabilities = mcu.calculate_absorption_probabilities(Q,I,R)
         return player_win_probabilities
         
@@ -171,6 +168,7 @@ class Sport:
         return [('lose')]
 
     # TODO: document
+    # Figure out sweetly tomorrow afternoon.
     def absolute_state_from_relative(self, rel_st, cur_level, cur_index, valid_indexes, abs_states):
         flatten = lambda x,y: x + y 
         if cur_level - 1 < 0:
@@ -183,13 +181,14 @@ class Sport:
         current_absolute_state = higher_states + [rel_st] + lower_states
         return current_absolute_state
 
-    # PLEASE
+    # Winning is seen as player A winning
     def propagate_serve_rules(self, transition_matrix, abs_st_to_in, abs_in_to_st, index_conections, isolated_level_states, total_level_states):
         for i in range(0, len(transition_matrix)):
             win_i = index_conections[i][0] if index_conections[i][0] != 'win' else absorbing_win_index
             los_i = index_conections[i][1] if index_conections[i][1] != 'lose' else absorbing_lose_index
-            transition_matrix[i,win_i] = 0.6
-            transition_matrix[i,los_i] = 0.4
+            # Change may need to happen to accomodate adv winn states.
+            transition_matrix[i,win_i] = 1
+            transition_matrix[i,los_i] = -1
         return transition_matrix
 
     def aggregated_level_size(self, x):
@@ -201,13 +200,19 @@ class Sport:
     '''
         Calculates number of states according to the 4 input parameters: Goal, Lead, Golden, Best_of
     '''
-    def calculate_number_of_states(self, goal, lead, golden, best_of):
+    def calculate_number_of_states(self, goal, lead, golden, best_of, number_of_serves=None):
         if best_of is not None:
             return int(math.ceil(best_of / 2)**2)
         # There is no golden
         if golden == 0 or golden == float('inf'): 
-            return goal**2 + max(0, 2*(lead - 1))
+            if number_of_serves is None or lead <= 1:
+                return goal**2 + max(0, 2*(lead - 1))
+            else:
+                number_advantage_state_clusters = 1 + (lead-1)*2
+                size_advantage_state_clusters   = 2*number_of_serves # constant 2 refers to number of players
+                return goal**2 -1 + number_advantage_state_clusters*size_advantage_state_clusters
 
+        
         # Golden case
         total_states = 0
         max_range = 2*golden

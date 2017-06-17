@@ -75,6 +75,41 @@ class GameLevelTest(unittest.TestCase):
         assert real_st_to_in == st_to_in
         assert real_in_to_st == in_to_st
 
+    def test_calculate_states_from_indexes_tiebreaker_serve(self):
+        g = gl.GameLevel(goal=2,lead=2,number_of_serves=2)
+        g.wp = 1
+        g.lp = -1
+        number_of_transient_states = 4
+        valid_indexes = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        real_st_to_in = {(0,0):0,
+                         (1,0):1,
+                         (0,1):2,
+                         ('adv',0,'a',0):3,
+                         ('adv',0,'a',1):4,
+                         ('adv',0,'b',0):5,
+                         ('adv',0,'b',1):6,
+                         ('adv',1,'a',0):7,
+                         ('adv',1,'a',1):8,
+                         ('adv',1,'b',0):9,
+                         ('adv',1,'b',1):10,
+                         ('adv',-1,'a',0):11,
+                         ('adv',-1,'a',1):12,
+                         ('adv',-1,'b',0):13,
+                         ('adv',-1,'b',1):14}
+
+        real_in_to_st = {k:v for v,k in real_st_to_in.items()}
+
+        in_to_st, st_to_in = g.calculate_states_from_indexes(number_of_transient_states, valid_indexes)
+        print('Calculated')
+        for (k,v) in in_to_st.viewitems():
+            print((k,v))
+        print('Real')
+        for (k,v) in real_in_to_st.viewitems():
+            print((k,v))
+        assert real_st_to_in == st_to_in
+        assert real_in_to_st == in_to_st
+
+
     ### Util functions ###
     def assert_is_over_outcome(self, goal=None, lead=None, golden=float("inf"),
                                           best_of=None, state=None, outcome=None):

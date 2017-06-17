@@ -6,9 +6,10 @@ class GameLevel:
 
 
 
-    def __init__(self, goal=None, lead=0, golden=float("inf"), best_of=None):
-        self.wp      = 9999 # will need to turn this into variables
-        self.lp      = -9999
+    def __init__(self, goal=None, lead=0, golden=float("inf"), best_of=None, number_of_serves=None):
+        self.wp      = 9999  # will need to turn this into variables
+        self.lp      = -9999 # These are not used here
+        self.number_of_serves = number_of_serves
         self.goal    = goal
         self.best_of = best_of
         # if there is a best_of, there can not be any lead or golden point,
@@ -23,70 +24,11 @@ class GameLevel:
         self.state_to_index = {}
 
 
-
-    '''
-        At this point in time, the transition matrix {matrix} has been initiated.
-        This function populates a part of the {matrix} using the {valid_indexes}.
-
-        There will be {number_of_transient_states} state additions.
-        All winning transitions will point to {win_index}
-        All losing transitions will point to {lose_index}
-    '''
-    def populate_transition_matrix(self, matrix, number_of_transient_states, valid_indexes,
-            win_index, lose_index):
-        # Initialize state population
-        initial_index          = valid_indexes[0]
-        self.states_populated  = {initial_index : (0,0)}
-        self.index_connections = {}
-
-        # Indexes outside current game level
-        self.win_index  = win_index
-        self.lose_index = lose_index
-
-        # if lead advantage is set and golden point is not set, start by populating adv states
-        if self.golden == float('inf') and self.lead > 0:
-            adv_states        = valid_indexes[self.goal**2:]
-            valid_indexes     = valid_indexes[:self.goal**2]
-            advantage = 1
-            assert len(adv_states) % 2 == 0
-            while len(adv_states) > 0:
-                a_adv, b_adv = adv_states.pop(0), adv_states.pop(0)
-                a_win_index, a_lose_index = a_adv + 2, a_adv - 2
-                b_win_index, b_lose_index = b_adv - 2, b_adv + 2
-                if advantage == 1:
-                    a_lose_index = a_adv - 1
-                if advantage == self.lead - 1:
-                    a_win_index  = win_index
-                    b_lose_index = lose_index
-                matrix[a_adv][a_win_index]  = self.wp
-                matrix[a_adv][a_lose_index] = self.lp
-                matrix[b_adv][b_win_index]  = self.wp
-                matrix[b_adv][b_lose_index] = self.lp
-
-                self.states_populated[a_adv] = ('adv', advantage)
-                self.states_populated[('adv',advantage)]  = a_adv
-                self.states_populated[b_adv] = ('adv', -advantage)
-                self.states_populated[('adv',-advantage)] = b_adv
-                self.index_connections[a_adv] = (a_win_index, a_lose_index)
-                self.index_connections[b_adv] = (b_win_index, b_lose_index)
-
-        # Create a copy of indexes to use whilst traversing
-        available_indexes = valid_indexes[1:]
-
-        # Use iterator for valid indexes 
-        for i in valid_indexes:
-            s_a ,s_b = self.states_populated[i]
-
-            print(str(s_a) + ', ' + str(s_b))
-            outcome_a = self.is_over((s_a + 1, s_b), self.goal, self.lead, self.golden, self.best_of)
-            outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
-
-            self.index_connections[i] = (win_index, lose_index)
-
-        # The part of the matrix corresponding to this part of the game must be filled by now
-        # There must be no available indexes left
-        assert len(available_indexes) == 0
-
+    """
+        Coolest function in the whole class
+        Calculates the states for this game level given a set of valid indexes. Search through the state space
+        is conducted in a breadth-first traversal manner.
+    """
     def calculate_states_from_indexes(self, number_of_transient_states, valid_indexes):
         # Initialize state population
         initial_index = valid_indexes[0]
@@ -95,47 +37,54 @@ class GameLevel:
         self.state_to_index[initial_state] = initial_index
 
         if self.golden == float('inf') and self.lead > 0:
-            valid_indexes = self.add_lead_indexes(valid_indexes,)
+            valid_indexes = self.add_lead_indexes(valid_indexes)
 
         available_indexes = valid_indexes[1:]
         for i in valid_indexes:
             s_a ,s_b = self.index_to_state[i]
 
-            #print(str(s_a) + ', ' + str(s_b))
             outcome_a = self.is_over((s_a + 1, s_b), self.goal, self.lead, self.golden, self.best_of)
             outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
-            #print('Outcome: ' + str(outcome_a) + ' state: ' + str((s_a +1,s_b)))
-            #print('Outcome: ' + str(outcome_b) + ' state: ' + str((s_a ,s_b +1)))
 
             self.calculate_next_index(outcome_a, (s_a+1, s_b), i, available_indexes, self.wp)
             self.calculate_next_index(outcome_b, (s_a, s_b+1), i, available_indexes, self.lp)
 
         return self.index_to_state, self.state_to_index
 
+    # Test this
     def add_lead_indexes(self, valid_indexes):
-        adv_states        = valid_indexes[self.goal**2:]
-        valid_indexes     = valid_indexes[:self.goal**2]
-        advantage = 1
-        assert len(adv_states) % 2 == 0
-        while len(adv_states) > 0 and advantage < self.lead:
-            a_adv, b_adv = adv_states.pop(0), adv_states.pop(0)
-           # This code may be unnecessary
-           #a_win_index, a_lose_index = a_adv + 2, a_adv - 2
-           #b_win_index, b_lose_index = b_adv - 2, b_adv + 2
-           #if advantage == 1:
-           #    a_lose_index = a_adv - 1
-           #if advantage == self.lead - 1:
-           #    a_win_index  = win_index
-           #    b_lose_index = lose_index
-            self.index_to_state[a_adv] = ('adv', advantage)
-            self.state_to_index[('adv',advantage)]  = a_adv
-            self.index_to_state[b_adv] = ('adv', -advantage)
-            self.state_to_index[('adv',-advantage)] = b_adv
-            advantage += 1
+        #May need to change this. to reduce the 
+        if self.number_of_serves is None:
+            adv_states        = valid_indexes[self.goal**2:]
+            valid_indexes     = valid_indexes[:self.goal**2]
+        else:
+            adv_states        = valid_indexes[(self.goal**2-1):]
+            valid_indexes     = valid_indexes[:(self.goal**2-1)]
+        if self.number_of_serves is None:
+            for advantage in range(1,self.lead):
+                a_adv, b_adv = adv_states.pop(0), adv_states.pop(0)
+                self.index_to_state[a_adv] = ('adv', advantage)
+                self.state_to_index[('adv',advantage)]  = a_adv
+                self.index_to_state[b_adv] = ('adv', -advantage)
+                self.state_to_index[('adv',-advantage)] = b_adv
+        else: # Case where the server changes in this game level.
+            flatten = lambda x,y: x + y # Flattens a list
+            # advantages go in pairs, [1,-1,2,-2...lead-1,-lead+1)]
+            for advantage in [0] + reduce(flatten,[[adv,-adv] for adv in range(1,self.lead)]):
+                # Assume advantage for 0 is already there
+                for player in ['a','b']: # Am I doing less breadth-first and more sweeping?
+                    for consecutive_serve in range(0, self.number_of_serves):
+                        #TODO: consider that goal**2 state will already have a value
+                        state = ('adv', advantage, player, consecutive_serve)
+                        adv_index = adv_states.pop(0)
+                        self.index_to_state[adv_index] = state
+                        self.state_to_index[state]     = adv_index
         return valid_indexes
 
     def calculate_next_index(self, outcome, state, cur_index, available_indexes, p):
-        # No won on outcome. There will be complications here
+        if self.number_of_serves is not None and state == (self.goal-1, self.goal-1):
+            # This is already covered in add lead indexes, this is advantage zero state
+            return
         if outcome == 0:
           # Check if state has already been populated
             if state not in self.index_to_state.values():
