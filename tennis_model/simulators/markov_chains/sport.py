@@ -95,6 +95,9 @@ class Sport:
 
         return all_valid_indexes
 
+    # TODO: Document
+    # In these function each game level maps their given indexes to relative states.
+    # Each relative state is converted into absolute state.
     def calculate_all_absolute_states(self, val_i, iso_level_sizes, total_level_sizes):
         abs_in_to_st = {}
         for i in range(0, len(val_i)):
@@ -102,6 +105,7 @@ class Sport:
                 g = gl.GameLevel(*self.level_rules[i])
                 in_to_st, _ = g.calculate_states_from_indexes(iso_level_sizes[i], val_i[i][j])
                 in_to_st    = {k : self.absolute_state_from_relative(v, i, j, val_i, abs_in_to_st) for k, v in in_to_st.items()}
+                # Add all values from dictionary 'in_to_st' to dictionary 'abs_in_to_st'
                 abs_in_to_st.update(in_to_st)
         return abs_in_to_st
 
@@ -167,16 +171,28 @@ class Sport:
                 continue
         return [('lose')]
 
-    # TODO: document
-    # Figure out sweetly tomorrow afternoon.
+    '''
+        rel_st: relative state that is to be expanded
+        cur_level: Current hierarchical level for which we are calculating the abs state
+        cur_index: Index in the list of valid indexes for the current level.
+                   (NOT the valid index used to represent the state)
+        valid_indexes: List of distributed valid indexes for all levels
+        abs_states: Dictionary of already calculated absolute states
+
+        Adds new absolute state from given relative state.
+    '''
     def absolute_state_from_relative(self, rel_st, cur_level, cur_index, valid_indexes, abs_states):
         flatten = lambda x,y: x + y 
         if cur_level - 1 < 0:
+            # We are at the top level, so there are no higher states
             higher_states = []
         else:
+            # List of valid indexes for the level above the current level
             flattened_list = reduce(flatten, valid_indexes[cur_level - 1])
             state_above_index = flattened_list[cur_index]
+            # State values for hierarchy levels above cur_level
             higher_states     = abs_states[state_above_index][:cur_level]
+        # State values for hierarchy levels below cur_level, which are all (0,0)
         lower_states  = [(0,0)] * (len(valid_indexes) - (cur_level + 1))
         current_absolute_state = higher_states + [rel_st] + lower_states
         return current_absolute_state

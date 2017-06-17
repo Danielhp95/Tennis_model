@@ -90,9 +90,26 @@ class SportTest(unittest.TestCase):
         current_index  = 1 # Note that indexes start at 0
         cur_level      = 1
         abs_states_dic = {4:[(1,0),(0,0)]} # only contains value that will be used
-        absolute_state  = s.absolute_state_from_relative(relative_state, cur_level, current_index, valid_indexes, abs_states_dic)
+        absolute_state  = s.absolute_state_from_relative(relative_state,
+                                                         cur_level, current_index,
+                                                         valid_indexes, abs_states_dic)
 
-        assert absolute_state == [(1,0),(0,1)]
+    def test_calculate_absolute_state_from_relative_two_levels_advantage_states(self):
+        s = sp.Sport()
+        relative_state       = ('adv',0,'a',0) 
+        isolated_level_sizes = [2,15]
+        total_level_sizes    = [30,15]
+        valid_indexes   = [[[0,15]],
+                           [[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],
+                           [15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]]]
+        current_index  = 1 # Note that indexes start at 0
+        cur_level      = 1
+        abs_states_dic = {15:[(1,0),(0,0)]} # only contains value that will be used
+        absolute_state  = s.absolute_state_from_relative(relative_state,
+                                                         cur_level, current_index,
+                                                         valid_indexes, abs_states_dic)
+
+        assert absolute_state == [(1,0),('adv',0,'a',0)]
         
     def test_calculate_absolute_state_from_relative_three_levels(self):
         s = sp.Sport()
@@ -119,7 +136,7 @@ class SportTest(unittest.TestCase):
 
         assert absolute_states == {0:[(0,0)],1:[(1,0)],2:[(0,1)],3:[(1,1)]}
 
-    def test_calculate_all_absolute_states_(self):
+    def test_calculate_all_absolute_states_best_of(self):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=3)
         s.add_hierarchy_level(best_of=3)
@@ -134,14 +151,6 @@ class SportTest(unittest.TestCase):
                                    5:[(1,0),(1,0)],6:[(1,0),(0,1)],7:[(1,0),(1,1)],
                                    9:[(0,1),(1,0)],10:[(0,1),(0,1)],11:[(0,1),(1,1)],
                                    13:[(1,1),(1,0)],14:[(1,1),(0,1)],15:[(1,1),(1,1)]}
-
-    #def test_win_index_from_valid_indexes(self):
-    #    s = sp.Sport()
-    #    isolated_level_sizes = [4,3,3]
-    #    total_level_sizes    = [36,9,3]
-    #    valid_indexes = [[[0,9,18,27]],
-    #                     [[0,3,6],[9,12,15],[18,21,24],[27,30,33]],
-    #                     [[0,1,2],[3,4,5],[6,7,8],[9,10,11],[12,13,14],[15,16,17],[18,19,20],[21,22,23],[24,25,26],[27,28,29],[30,31,32],[33,34,35]]]
 
     def test_next_win_state(self):
         s = sp.Sport()
