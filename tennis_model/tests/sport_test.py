@@ -178,6 +178,9 @@ class SportTest(unittest.TestCase):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=3)
         s.add_hierarchy_level(goal=4,lead=2,number_of_serves=2)
+
+        self.assert_win_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',(0,'b',0))],sport=s)
+
         self.assert_win_state_equals(state=[(0,0),('adv',(0,'a',0))], expected=[(0,0),('adv',(1,'a',1))],sport=s)
         self.assert_win_state_equals(state=[(0,0),('adv',(0,'a',1))], expected=[(0,0),('adv',(1,'b',0))],sport=s)
         self.assert_win_state_equals(state=[(0,0),('adv',(0,'b',0))], expected=[(0,0),('adv',(1,'b',1))],sport=s)
@@ -193,10 +196,15 @@ class SportTest(unittest.TestCase):
         self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,0),('adv',(0,'b',1))],sport=s)
         self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,0),('adv',(0,'a',0))],sport=s)
 
+        #self.assert_win_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',(1,'a',1))],sport=s)
+
     def test_next_lose_state_number_of_serves(self):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=3)
         s.add_hierarchy_level(goal=4,lead=2,number_of_serves=2)
+
+        self.assert_lose_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',(0,'b',0))],sport=s)
+
         self.assert_lose_state_equals(state=[(0,0),('adv',(0,'a',0))], expected=[(0,0),('adv',(-1,'a',1))],sport=s)
         self.assert_lose_state_equals(state=[(0,0),('adv',(0,'a',1))], expected=[(0,0),('adv',(-1,'b',0))],sport=s)
         self.assert_lose_state_equals(state=[(0,0),('adv',(0,'b',0))], expected=[(0,0),('adv',(-1,'b',1))],sport=s)
@@ -211,6 +219,8 @@ class SportTest(unittest.TestCase):
         self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'a',1))], expected=[(0,1),(0,0)],sport=s)
         self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,1),(0,0)],sport=s)
         self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,1),(0,0)],sport=s)
+
+         #self.assert_lose_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',(-1,'a',1))],sport=s)
 
     def test_next_lose_state_lead(self):
         s = sp.Sport()
@@ -235,10 +245,10 @@ class SportTest(unittest.TestCase):
         self.assert_lose_state_equals(state=[(3,3),(0,3)], expected=['lose'],sport=s)
 
     def assert_win_state_equals(self, state=None, expected=None, sport=None):
-        assert expected == sport.calculate_next_win_state(state)
+        assert sport.calculate_next_win_state(state) == expected 
 
     def assert_lose_state_equals(self, state=None, expected=None, sport=None):
-        assert expected == sport.calculate_next_lose_state(state)
+        assert sport.calculate_next_lose_state(state) == expected
 
     #### Generating transition matrixes ###
 
@@ -279,16 +289,16 @@ class SportTest(unittest.TestCase):
         real_t_m  = self.get_trans_matrix_lead_golden_multiple_level()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
-  #  def test_transition_matrix_tiebreaker_serve(self):
-  #      s = sp.Sport()
-  #      s.add_hierarchy_level(goal=3, lead=2, serve'magic')
-  #      t_m = s.compute_transition_matrix()
-  #      real_t_m = self.get_trans_matrix_serve_tiebreaker()
-  #      np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+    def test_transition_matrix_tiebreaker_serve(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(goal=3, lead=2, number_of_serves=2)
+        t_m = s.compute_transition_matrix()
+        real_t_m = self.get_transition_matrix_tiebreaker()
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
-    def get_transition_matrix_tiebreaker_tiebreaker(self):
+    def get_transition_matrix_tiebreaker(self):
         win  = 20
-        lose = 31
+        lose = 21
         spw_a, spw_b = 0.7, 0.6
         transition_matrix = np.zeros((20,22))
         transition_matrix[0][1]     = spw_a

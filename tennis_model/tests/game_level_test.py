@@ -59,6 +59,9 @@ class GameLevelTest(unittest.TestCase):
         self.assert_is_over_outcome(goal=5, lead=3, golden=8, state=(6,8), outcome=-3)
         self.assert_is_over_outcome(goal=5, lead=3, golden=8, state=(7,8), outcome=-3)
 
+    def test_is_over_number_of_serves(self):
+        self.assert_is_over_outcome(goal=3, lead=2, number_of_serves=2, state=(3,3), outcome=2)
+
     ### Test for probability propagation functionality ###
 
     # This is one of the most basic scenarios. There is no golden point
@@ -100,21 +103,15 @@ class GameLevelTest(unittest.TestCase):
         real_in_to_st = {k:v for v,k in real_st_to_in.items()}
 
         in_to_st, st_to_in = g.calculate_states_from_indexes(number_of_transient_states, valid_indexes)
-        print('Calculated')
-        for (k,v) in in_to_st.viewitems():
-            print((k,v))
-        print('Real')
-        for (k,v) in real_in_to_st.viewitems():
-            print((k,v))
         assert real_st_to_in == st_to_in
         assert real_in_to_st == in_to_st
 
 
     ### Util functions ###
     def assert_is_over_outcome(self, goal=None, lead=None, golden=float("inf"),
-                                          best_of=None, state=None, outcome=None):
-        g = gl.GameLevel(goal, lead, golden, best_of)
-        assert outcome == g.is_over(state, goal, lead, golden, best_of)
+                                          best_of=None, number_of_serves=None, state=None, outcome=None):
+        g = gl.GameLevel(goal, lead, golden, best_of, number_of_serves)
+        assert outcome == g.is_over(state, goal, lead, golden, best_of, number_of_serves)
 
     def create_trans_matrix_only_goal(self, wp, lp):
         # goal=3, lead=0

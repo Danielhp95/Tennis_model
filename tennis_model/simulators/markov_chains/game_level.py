@@ -173,7 +173,7 @@ class GameLevel:
 
         # Fourth check: we are inside a deuce
         # Deuce condition concept changes if the server changes in this game level.
-        deuce_condition = lambda score: score >= goal if number_of_serves is None else score > goal
+        deuce_condition = lambda score: score >= goal if number_of_serves is None else score >= goal - 1
         if deuce_condition(s_a) and s_a >= s_b and within_lead:
             return 2 if golden == float('inf') else 0
         if deuce_condition(s_b) and s_b >= s_a and within_lead:
