@@ -10,12 +10,12 @@ class Sport:
         self.name        = 'NO_NAME_GIVEN'
         self.level_rules = []
     
-    def add_hierarchy_level(self, goal=0, lead=0, golden=float('inf'), best_of=None):
+    def add_hierarchy_level(self, goal=0, lead=0, golden=float('inf'), best_of=None, number_of_serves=None):
         # checks
         if best_of is None:
             assert goal >= 1
             assert lead <= goal
-        self.level_rules.append((goal, lead, golden, best_of))
+        self.level_rules.append((goal, lead, golden, best_of, number_of_serves))
 
     def compute_transition_matrix(self):
         # State space size for each level of the hirarchy
@@ -60,7 +60,8 @@ class Sport:
 
         return transition_matrix
 
-    # TODO: Complete function
+    # Returns the probabilities of
+    # all transient states being absorbed by each absorbing state
     def compute_winning_probabilities(self, spw=[None, None]):
         transition_matrix = self.compute_transition_matrix() # May need to pass spw tp function
         Q = transition_matrix[:,:self.total_states]
@@ -69,7 +70,8 @@ class Sport:
         player_win_probabilities = mcu.calculate_absorption_probabilities(Q,I,R)
         return player_win_probabilities
         
-
+    # Initializes the transition probability matrix
+    # by creating a matrix of the right dimensions and filling it with zeros.
     def initialize_transition_matrix(self, num_transient_states):
         # First two variables are in desceding order.
         num_absorbing_states  = 2 # Win and Lose absorbing states
@@ -114,12 +116,23 @@ class Sport:
         next_win_state = state[:]
         for i in range(len(state)-1,-1,-1):
             s_a, s_b = state[i]
-            level_goal, level_lead, _, _ = self.level_rules[i]
+            level_goal, level_lead, level_golden, level_best_of, level_number_of_serves= self.level_rules[i]
             # We are inside a deuce
             if s_a == 'adv':
-                if s_b < level_lead - 1:
-                    new_advantage = s_b + 1
-                    next_win_state[i] = ('adv',new_advantage) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                advantage,server,consecutive_serves = s_b
+                if advantage < level_lead - 1: # Check if minimum lead has been reached
+                    new_advantage = advantage + 1
+                    if level_number_of_serves is None:
+                        new_server             = ''
+                        new_consecutive_serves = 0
+                        relative_next_win_state = ('adv',(new_advantage,new_server,new_consecutive_serves)) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                    else:
+                        relative_next_win_state = self.next_advantage_state_multiple_serves(new_advantage,
+                                                          server,
+                                                          consecutive_serves,
+                                                          level_number_of_serves)
+                        print(relative_next_win_state)
+                    next_win_state[i] = relative_next_win_state
                     return next_win_state
                 else:
                     next_win_state[i] = (0,0)
@@ -132,7 +145,7 @@ class Sport:
                 return next_win_state 
             if outcome == 2: # No need to worry about Best_of because lead and best_of are mutually exclusive
                 advantage = (s_a + 1) - s_b
-                next_win_state[i] = ('adv', advantage) if advantage != 0 else (level_goal -1, level_goal-1)
+                next_win_state[i] = ('adv', (advantage,'',0)) if advantage != 0 else (level_goal -1, level_goal-1)
                 return next_win_state
             if outcome == 1 or outcome == 3:
                 # We move to next game level. We reset this level
@@ -145,12 +158,24 @@ class Sport:
         next_lose_state = state[:]
         for i in range(len(state)-1,-1,-1):
             s_a, s_b = state[i]
-            level_goal, level_lead, _, _ = self.level_rules[i]
+            # Technical debt: create dictionary of level_rules. Unpacking not cool
+            level_goal, level_lead, level_golden, level_best_of, level_number_of_serves= self.level_rules[i]
             # We are inside a deuce
             if s_a == 'adv':
-                if s_b > -1*(level_lead - 1):
-                    new_advantage = s_b - 1
-                    next_lose_state[i] = ('adv',new_advantage) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                advantage,server,consecutive_serves = s_b
+                if advantage > -1*(level_lead - 1):
+                    new_advantage = advantage - 1
+                    if level_number_of_serves is None:
+                        new_server             = ''
+                        new_consecutive_serves = 0
+                        relative_next_lose_state = ('adv',(new_advantage,new_server,new_consecutive_serves)) if new_advantage !=0 else (level_goal -1, level_goal-1)
+                    else:
+                        relative_next_lose_state = self.next_advantage_state_multiple_serves(new_advantage,
+                                                          server,
+                                                          consecutive_serves,
+                                                          level_number_of_serves)
+
+                    next_lose_state[i] = relative_next_lose_state
                     return next_lose_state
                 else:
                     next_lose_state[i] = (0,0)
@@ -163,13 +188,25 @@ class Sport:
                 return next_lose_state 
             if outcome == -2: # No need to worry about Best_of because lead and best_of are mutually exclusive
                 advantage = s_a - (s_b + 1)
-                next_lose_state[i] = ('adv', advantage) if advantage != 0 else (level_goal -1, level_goal-1)
+                next_lose_state[i] = ('adv', (advantage,'',0)) if advantage != 0 else (level_goal -1, level_goal-1)
                 return next_lose_state
             if outcome == -1 or outcome == -3:
                 # We move to next game level. We reset this level
                 next_lose_state[i] = (0,0)
                 continue
         return [('lose')]
+
+    def next_advantage_state_multiple_serves(self, new_advantage, server,
+                                             consecutive_serves, number_of_serves):
+        players = ['a','b']
+        new_consecutive_serves  = (consecutive_serves + 1) % number_of_serves
+        change_server_condition = consecutive_serves + 1 >= number_of_serves
+        new_server  = ('b' if server == 'a' else 'a') if change_server_condition else server
+        new_consecutive_serves = (consecutive_serves + 1) % number_of_serves
+        print(new_advantage)
+        print(new_server)
+        return ('adv',(new_advantage,new_server,new_consecutive_serves))
+
 
     '''
         rel_st: relative state that is to be expanded
@@ -211,7 +248,7 @@ class Sport:
         return [reduce(lambda x,y: x*y, x[i:]) for i in range(0,len(x))] # What an obscure and beautiful line of code
 
     def isolated_level_size(self):
-        return map(lambda (goal, lead, golden, best_of): self.calculate_number_of_states(goal, lead, golden, best_of), self.level_rules)
+        return map(lambda rules: self.calculate_number_of_states(*rules), self.level_rules)
 
     '''
         Calculates number of states according to the 4 input parameters: Goal, Lead, Golden, Best_of

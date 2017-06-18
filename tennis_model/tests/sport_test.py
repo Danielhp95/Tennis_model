@@ -96,7 +96,7 @@ class SportTest(unittest.TestCase):
 
     def test_calculate_absolute_state_from_relative_two_levels_advantage_states(self):
         s = sp.Sport()
-        relative_state       = ('adv',0,'a',0) 
+        relative_state       = ('adv',(0,'a',0)) 
         isolated_level_sizes = [2,15]
         total_level_sizes    = [30,15]
         valid_indexes   = [[[0,15]],
@@ -109,7 +109,7 @@ class SportTest(unittest.TestCase):
                                                          cur_level, current_index,
                                                          valid_indexes, abs_states_dic)
 
-        assert absolute_state == [(1,0),('adv',0,'a',0)]
+        assert absolute_state == [(1,0),('adv',(0,'a',0))]
         
     def test_calculate_absolute_state_from_relative_three_levels(self):
         s = sp.Sport()
@@ -167,23 +167,61 @@ class SportTest(unittest.TestCase):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=5)
         s.add_hierarchy_level(goal=4,lead=3)
-        self.assert_win_state_equals(state=[(0,0),('adv',1)], expected=[(0,0),('adv',2)],sport=s)
-        self.assert_win_state_equals(state=[(0,0),('adv',2)], expected=[(1,0),(0,0)],sport=s)
-        self.assert_win_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',1)],sport=s) 
-        self.assert_win_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',2)],sport=s) 
-        self.assert_win_state_equals(state=[(0,0),('adv',-1)], expected=[(0,0),(3,3)],sport=s)
-        self.assert_win_state_equals(state=[(0,0),('adv',-2)], expected=[(0,0),('adv',-1)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(1,'',0))], expected=[(0,0),('adv',(2,'',0))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(2,'',0))], expected=[(1,0),(0,0)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',(1,'',0))],sport=s) 
+        self.assert_win_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',(2,'',0))],sport=s) 
+        self.assert_win_state_equals(state=[(0,0),('adv',(-1,'',0))], expected=[(0,0),(3,3)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(-2,'',0))], expected=[(0,0),('adv',(-1,'',0))],sport=s)
+
+    def test_next_win_state_number_of_serves(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(best_of=3)
+        s.add_hierarchy_level(goal=4,lead=2,number_of_serves=2)
+        self.assert_win_state_equals(state=[(0,0),('adv',(0,'a',0))], expected=[(0,0),('adv',(1,'a',1))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(0,'a',1))], expected=[(0,0),('adv',(1,'b',0))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(0,'b',0))], expected=[(0,0),('adv',(1,'b',1))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(0,'b',1))], expected=[(0,0),('adv',(1,'a',0))],sport=s)
+        
+        self.assert_win_state_equals(state=[(0,0),('adv',(1,'a',0))], expected=[(1,0),(0,0)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(1,'a',1))], expected=[(1,0),(0,0)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(1,'b',0))], expected=[(1,0),(0,0)],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(1,'b',1))], expected=[(1,0),(0,0)],sport=s)
+
+        self.assert_win_state_equals(state=[(0,0),('adv',(-1,'a',0))], expected=[(0,0),('adv',(0,'a',1))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(-1,'a',1))], expected=[(0,0),('adv',(0,'b',0))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,0),('adv',(0,'b',1))],sport=s)
+        self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,0),('adv',(0,'a',0))],sport=s)
+
+    def test_next_lose_state_number_of_serves(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(best_of=3)
+        s.add_hierarchy_level(goal=4,lead=2,number_of_serves=2)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(0,'a',0))], expected=[(0,0),('adv',(-1,'a',1))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(0,'a',1))], expected=[(0,0),('adv',(-1,'b',0))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(0,'b',0))], expected=[(0,0),('adv',(-1,'b',1))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(0,'b',1))], expected=[(0,0),('adv',(-1,'a',0))],sport=s)
+        
+        self.assert_lose_state_equals(state=[(0,0),('adv',(1,'a',0))], expected=[(0,0),('adv',(0,'a',1))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(1,'a',1))], expected=[(0,0),('adv',(0,'b',0))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(1,'b',0))], expected=[(0,0),('adv',(0,'b',1))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(1,'b',1))], expected=[(0,0),('adv',(0,'a',0))],sport=s)
+
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'a',0))], expected=[(0,1),(0,0)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'a',1))], expected=[(0,1),(0,0)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,1),(0,0)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,1),(0,0)],sport=s)
 
     def test_next_lose_state_lead(self):
         s = sp.Sport()
         s.add_hierarchy_level(best_of=5)
         s.add_hierarchy_level(goal=4,lead=3)
-        self.assert_lose_state_equals(state=[(0,0),('adv',-1)], expected=[(0,0),('adv',-2)],sport=s)
-        self.assert_lose_state_equals(state=[(0,0),('adv',-2)], expected=[(0,1),(0,0)],sport=s)
-        self.assert_lose_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',-1)],sport=s) 
-        self.assert_lose_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',-2)],sport=s) 
-        self.assert_lose_state_equals(state=[(0,0),('adv',1)], expected=[(0,0),(3,3)],sport=s)
-        self.assert_lose_state_equals(state=[(0,0),('adv',2)], expected=[(0,0),('adv',1)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'',0))], expected=[(0,0),('adv',(-2,'',0))],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(-2,'',0))], expected=[(0,1),(0,0)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),(3,3)], expected=[(0,0),('adv',(-1,'',0))],sport=s) 
+        self.assert_lose_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',(-2,'',0))],sport=s) 
+        self.assert_lose_state_equals(state=[(0,0),('adv',(1,'',0))], expected=[(0,0),(3,3)],sport=s)
+        self.assert_lose_state_equals(state=[(0,0),('adv',(2,'',0))], expected=[(0,0),('adv',(1,'',0))],sport=s)
 
     def test_next_lose_state(self):
         s = sp.Sport()

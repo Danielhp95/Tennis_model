@@ -60,22 +60,26 @@ class GameLevel:
         else:
             adv_states        = valid_indexes[(self.goal**2-1):]
             valid_indexes     = valid_indexes[:(self.goal**2-1)]
+
+        # The reason why we have this separation is to differentiate
+        # the cases where the server does not change
+        # and server changing midway through the game level.
         if self.number_of_serves is None:
             for advantage in range(1,self.lead):
                 a_adv, b_adv = adv_states.pop(0), adv_states.pop(0)
-                self.index_to_state[a_adv] = ('adv', advantage)
-                self.state_to_index[('adv',advantage)]  = a_adv
-                self.index_to_state[b_adv] = ('adv', -advantage)
-                self.state_to_index[('adv',-advantage)] = b_adv
+                self.index_to_state[a_adv] = ('adv', (advantage,'',0))
+                self.state_to_index[('adv',(advantage,'',0))]  = a_adv
+                self.index_to_state[b_adv] = ('adv', (-advantage,'',0))
+                self.state_to_index[('adv',(-advantage,'',0))] = b_adv
         else: # Case where the server changes in this game level.
             flatten = lambda x,y: x + y # Flattens a list
             # advantages go in pairs, [1,-1,2,-2...lead-1,-lead+1)]
             for advantage in [0] + reduce(flatten,[[adv,-adv] for adv in range(1,self.lead)]):
                 # Assume advantage for 0 is already there
-                for player in ['a','b']: # Am I doing less breadth-first and more sweeping?
-                    for consecutive_serve in range(0, self.number_of_serves):
+                for server in ['a','b']: # Am I doing less breadth-first and more sweeping?
+                    for consecutive_serves in range(0, self.number_of_serves):
                         #TODO: consider that goal**2 state will already have a value
-                        state = ('adv', advantage, player, consecutive_serve)
+                        state = ('adv', (advantage, server, consecutive_serves))
                         adv_index = adv_states.pop(0)
                         self.index_to_state[adv_index] = state
                         self.state_to_index[state]     = adv_index
@@ -104,8 +108,18 @@ class GameLevel:
         if outcome == 2 or outcome == -2:
             # Calculates advantage
             s_a, s_b        = state
+            print(state)
             advantage       = s_a - s_b
-            advantage_state = ('adv',advantage)
+            players = ['a','b']
+            k       = s_a + s_b # What point we are in the game level
+            if self.number_of_serves is None:
+                server = ''
+                consecutive_serves = 0
+            else:
+                server_index  = math.floor(k/self.number_of_serves) % len(players)
+                server  = players[server_index]
+                consecutive_serves = k % self.number_of_serves
+            advantage_state = ('adv',(advantage,server,consecutive_serves))
   
             # Check if we have already visited this state
             if advantage_state not in self.state_to_index:
@@ -127,7 +141,7 @@ class GameLevel:
        3 : winner a golden point
     '''
     @staticmethod
-    def is_over(state, goal, lead, golden, best_of):
+    def is_over(state, goal, lead, golden, best_of,number_of_serves=None):
         s_a, s_b = state
 
         # First check: best of has been reached
@@ -157,11 +171,12 @@ class GameLevel:
         if win_b:
             return -1
 
-
         # Fourth check: we are inside a deuce
-        if s_a >= goal and s_a >= s_b and within_lead:
+        # Deuce condition concept changes if the server changes in this game level.
+        deuce_condition = lambda score: score >= goal if number_of_serves is None else score > goal
+        if deuce_condition(s_a) and s_a >= s_b and within_lead:
             return 2 if golden == float('inf') else 0
-        if s_b >= goal and s_b >= s_a and within_lead:
+        if deuce_condition(s_b) and s_b >= s_a and within_lead:
             return -2 if golden == float('inf') else 0
 
         # Fifth check: match continues without special condition
