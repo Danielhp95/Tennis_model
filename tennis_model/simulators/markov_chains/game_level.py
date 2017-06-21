@@ -6,7 +6,7 @@ class GameLevel:
 
 
 
-    def __init__(self, goal=None, lead=0, golden=float("inf"), best_of=None, number_of_serves=None):
+    def __init__(self, goal=None, lead=1, golden=float("inf"), best_of=None, number_of_serves=None):
         self.wp      = 9999  # will need to turn this into variables
         self.lp      = -9999 # These are not used here
         self.number_of_serves = number_of_serves
@@ -86,7 +86,8 @@ class GameLevel:
         return valid_indexes
 
     def calculate_next_index(self, outcome, state, cur_index, available_indexes, p):
-        if self.number_of_serves is not None and state == (self.goal-1, self.goal-1):
+        # Case where the state (goal -1, goal-1) becomes a deuce state
+        if self.number_of_serves is not None and self.lead > 1 and state == (self.goal-1, self.goal-1):
             # This is already covered in add lead indexes, this is advantage zero state
             return
         if outcome == 0:
@@ -108,7 +109,6 @@ class GameLevel:
         if outcome == 2 or outcome == -2:
             # Calculates advantage
             s_a, s_b        = state
-            print(state)
             advantage       = s_a - s_b
             players = ['a','b']
             k       = s_a + s_b # What point we are in the game level
@@ -173,10 +173,12 @@ class GameLevel:
 
         # Fourth check: we are inside a deuce
         # Deuce condition concept changes if the server changes in this game level.
-        deuce_condition = lambda score: score >= goal if number_of_serves is None else score >= goal - 1
-        if deuce_condition(s_a) and s_a >= s_b and within_lead:
+        normal_deuce_condition = lambda s_a, s_b: (s_a >= goal or s_b >= goal)
+        number_of_states_deuce_condition = lambda s_a, s_b: (s_a >= goal or s_b >= goal) or (s_a == goal -1 and s_b == goal -1)
+        deuce_condition = lambda s_a,s_b: normal_deuce_condition(s_a,s_b) if (number_of_serves is None and lead > 1) else number_of_states_deuce_condition(s_a,s_b)
+        if deuce_condition(s_a,s_b) and s_a >= s_b and within_lead:
             return 2 if golden == float('inf') else 0
-        if deuce_condition(s_b) and s_b >= s_a and within_lead:
+        if deuce_condition(s_a,s_b) and s_b >= s_a and within_lead:
             return -2 if golden == float('inf') else 0
 
         # Fifth check: match continues without special condition

@@ -196,7 +196,11 @@ class SportTest(unittest.TestCase):
         self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,0),('adv',(0,'b',1))],sport=s)
         self.assert_win_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,0),('adv',(0,'a',0))],sport=s)
 
-        #self.assert_win_state_equals(state=[(0,0),(3,2)], expected=[(0,0),('adv',(1,'a',1))],sport=s)
+    def test_next_win_state_number_of_serves_2(self):
+        s = sp.Sport()
+        s.add_hierarchy_level(goal=2, lead=2,number_of_serves=2)
+        self.assert_win_state_equals(state=[(0,0)], expected=[(1,0)],sport=s)
+
 
     def test_next_lose_state_number_of_serves(self):
         s = sp.Sport()
@@ -220,7 +224,6 @@ class SportTest(unittest.TestCase):
         self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',0))], expected=[(0,1),(0,0)],sport=s)
         self.assert_lose_state_equals(state=[(0,0),('adv',(-1,'b',1))], expected=[(0,1),(0,0)],sport=s)
 
-         #self.assert_lose_state_equals(state=[(0,0),(2,3)], expected=[(0,0),('adv',(-1,'a',1))],sport=s)
 
     def test_next_lose_state_lead(self):
         s = sp.Sport()
@@ -253,14 +256,14 @@ class SportTest(unittest.TestCase):
     #### Generating transition matrixes ###
 
     def test_transition_matrix_single_level(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.5,0.5])
         s.add_hierarchy_level(goal=3)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_transition_matrix_single_level()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_double_level(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.5,0.5])
         s.add_hierarchy_level(best_of=3)
         s.add_hierarchy_level(goal=2)
         t_m       = s.compute_transition_matrix()
@@ -268,33 +271,120 @@ class SportTest(unittest.TestCase):
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_lead(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.5,0.5])
         s.add_hierarchy_level(goal=3, lead=2)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_trans_matrix_lead_2()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_lead_golden(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.5,0.5])
         s.add_hierarchy_level(goal=4, lead=2, golden=6)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_trans_matrix_lead_golden()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_lead_golden_multiple_level(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.5,0.5])
         s.add_hierarchy_level(best_of=3)
         s.add_hierarchy_level(goal=4, lead=3, golden=5)
         t_m       = s.compute_transition_matrix()
         real_t_m  = self.get_trans_matrix_lead_golden_multiple_level()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
+    def test_transition_matrix_number_of_serves_lead(self):
+        spw = [0.7, 0.6]
+        s = sp.Sport(serve_win_probabilities=spw)
+        s.add_hierarchy_level(goal=2, lead=2, number_of_serves=2)
+        t_m = s.compute_transition_matrix()
+        real_t_m = self.get_transition_matrix_number_of_serves_lead(spw)
+        #print('Real')
+        #print(real_t_m)
+        #print('Calculated')
+        #print(t_m)
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def test_transition_matrix_number_of_serves(self):
+        spw = [0.7, 0.6]
+        s = sp.Sport(serve_win_probabilities=spw)
+        s.add_hierarchy_level(goal=3, number_of_serves=2)
+        t_m = s.compute_transition_matrix()
+        real_t_m = self.get_transition_matrix_number_of_serves(spw)
+        print('Real')
+        print(real_t_m)
+        print('Calculated')
+        print(t_m)
+        np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
     def test_transition_matrix_tiebreaker_serve(self):
         s = sp.Sport()
+        # Needs to offset first serve by 1
         s.add_hierarchy_level(goal=3, lead=2, number_of_serves=2)
         t_m = s.compute_transition_matrix()
         real_t_m = self.get_transition_matrix_tiebreaker()
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
+
+    def get_transition_matrix_number_of_serves(self, spw):
+        win = 9
+        lose = 10
+        spw_a , spw_b = spw
+        t_m = np.zeros((9,11))
+        t_m[0][1] = spw_a
+        t_m[0][2] = 1-spw_a
+        t_m[1][3] = spw_a
+        t_m[1][4] = 1-spw_a
+        t_m[2][4] = spw_a
+        t_m[2][5] = 1-spw_a
+        t_m[3][win] = 1-spw_b
+        t_m[3][6] = spw_b
+        t_m[4][6] = 1-spw_b
+        t_m[4][7] = spw_b
+        t_m[5][7] = 1-spw_b
+        t_m[5][lose] = spw_b
+        t_m[6][win] = 1-spw_b
+        t_m[6][8] = spw_b
+        t_m[7][8] = 1-spw_b
+        t_m[7][lose] = spw_b
+        t_m[8][win] = spw_a
+        t_m[8][lose] = 1-spw_a
+        return t_m
+
+    def get_transition_matrix_number_of_serves_lead(self, spw):
+        win  = 15
+        lose = 16
+        spw_a , spw_b = spw
+        transition_matrix = np.zeros((15,17))
+        transition_matrix[0][1] = spw_a
+        transition_matrix[0][2] = 1 - spw_a
+        transition_matrix[1][win] = spw_a
+        transition_matrix[1][5] = 1 - spw_a
+        transition_matrix[2][5] = spw_a
+        transition_matrix[2][lose] = 1 - spw_a
+        transition_matrix[3][8] = spw_a
+        transition_matrix[3][12] = 1 - spw_a
+        transition_matrix[4][9] = spw_a
+        transition_matrix[4][13] = 1 - spw_a
+        transition_matrix[5][10] = 1 - spw_b
+        transition_matrix[5][14] = spw_b
+        transition_matrix[6][7] = 1 - spw_b
+        transition_matrix[6][11] = spw_b
+        transition_matrix[7][win] = spw_a
+        transition_matrix[7][4] = 1 - spw_a
+        transition_matrix[8][win] = spw_a
+        transition_matrix[8][5] = 1 - spw_a
+        transition_matrix[9][win] = 1 - spw_b
+        transition_matrix[9][6] = spw_b
+        transition_matrix[10][win] = 1 - spw_b
+        transition_matrix[10][3] = spw_b
+        transition_matrix[11][4] = spw_a
+        transition_matrix[11][lose] = 1 - spw_a
+        transition_matrix[12][5] = spw_a
+        transition_matrix[12][lose] = 1 - spw_a
+        transition_matrix[13][6] = 1 - spw_b
+        transition_matrix[13][lose] = spw_b
+        transition_matrix[14][3] = 1 - spw_b
+        transition_matrix[14][lose] = spw_b
+        return transition_matrix
 
     def get_transition_matrix_tiebreaker(self):
         win  = 20
@@ -346,7 +436,7 @@ class SportTest(unittest.TestCase):
     def get_transition_matrix_single_level(self):
         win = 9
         lose = 10
-        wp, lp = 1,-1
+        wp, lp = 0.5,0.5
         transition_matrix = np.zeros((9,11))
         transition_matrix[0][1] = wp
         transition_matrix[0][2] = lp
@@ -371,7 +461,7 @@ class SportTest(unittest.TestCase):
     def get_transition_matrix_double_level(self):
         win = 16
         lose = 17
-        wp, lp = 1,-1
+        wp, lp = 0.5,0.5
         transition_matrix = np.zeros((16,18))
         transition_matrix[0][1] = wp
         transition_matrix[0][2] = lp
@@ -436,8 +526,8 @@ class SportTest(unittest.TestCase):
         # goal=3, lead=2
         win_index = 11
         lose_index = 12
-        wp = 1
-        lp = -1
+        wp = 0.5
+        lp = 0.5
         trans_m = np.zeros((11,13))
         trans_m[0][1] = wp
         trans_m[0][2] = lp
@@ -468,8 +558,8 @@ class SportTest(unittest.TestCase):
         win_index = 22
         lose_index = 23
         trans_m = np.zeros((22,24))
-        wp = 1
-        lp = -1
+        wp = 0.5
+        lp = 0.5
 
         trans_m[0][1] = wp
         trans_m[0][2] = lp
@@ -524,8 +614,8 @@ class SportTest(unittest.TestCase):
         win_index = 84
         lose_index = 85
         trans_m = np.zeros((84,86))
-        wp = 1
-        lp = -1
+        wp = 0.5
+        lp = 0.5
     
         trans_m[0][1] = wp
         trans_m[0][2] = lp

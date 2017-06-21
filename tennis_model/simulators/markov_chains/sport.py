@@ -6,10 +6,12 @@ import math
 
 class Sport:
 
+
     def __init__(self, name='Unnamed sport', serve_win_probabilities=[1,-1]):
         self.name                    = name
         self.serve_win_probabilities = serve_win_probabilities
         self.level_rules             = []
+        self.NUM_OF_PLAYERS = 2
     
     def add_hierarchy_level(self, goal=0, lead=0, golden=float('inf'), best_of=None, number_of_serves=None):
         # checks
@@ -45,9 +47,10 @@ class Sport:
         abs_st_to_in[('lose',)] = absorbing_lose_index
 
         # Calculate where each state will lead to upon winning or losing a point
+        print(abs_in_to_st)
         index_conections = {index : (self.calculate_next_win_state(st),self.calculate_next_lose_state(st)) for index, st in abs_in_to_st.items()}
+        #print(index_conections)
         # Transform value states into indexes 
-        print(index_conections)
         index_conections = {index : (abs_st_to_in[tuple(win_s)], abs_st_to_in[tuple(los_s)]) for index, (win_s, los_s) in index_conections.items()}
 
         # Having calculated which entries in the matrix will need to be populated with some transition probability.
@@ -255,24 +258,95 @@ class Sport:
             higher_states     = abs_states[state_above_index][:cur_level]
         # State values for hierarchy levels below cur_level, which are all (0,0)
         lower_states  = [(0,0)] * (len(valid_indexes) - (cur_level + 1))
-        current_absolute_state = higher_states + [rel_st] + lower_states
-        return current_absolute_state
+        cur_absolute_state = higher_states + [rel_st] + lower_states
+        return cur_absolute_state
 
     # Winning is seen as player A winning
     def propagate_serve_rules(self, transition_matrix, abs_st_to_in, abs_in_to_st, index_conections, isolated_level_states, total_level_states):
+        spw_a, spw_b = self.serve_win_probabilities
+        initial_server = 'a'
+        cur_server = initial_server
         for i in range(0, len(transition_matrix)):
             win_i = index_conections[i][0] if index_conections[i][0] != 'win' else absorbing_win_index
             los_i = index_conections[i][1] if index_conections[i][1] != 'lose' else absorbing_lose_index
+            win_p, los_p = self.calculate_win_and_lose_point_probabilities(i, cur_server, isolated_level_states, abs_in_to_st)
             # Change may need to happen to accomodate adv winn states.
-            transition_matrix[i,win_i] = 1
-            transition_matrix[i,los_i] = -1
+            transition_matrix[i,win_i] = win_p
+            transition_matrix[i,los_i] = los_p
         return transition_matrix
 
+
+    def calculate_win_and_lose_point_probabilities(self, cur_index, cur_server, isolated_level_states, abs_in_to_st):
+        spw_a, spw_b = self.serve_win_probabilities
+        cur_absolute_state = abs_in_to_st[cur_index]
+        levels_with_server_change = self.filter_game_levels_with_serving_rules()
+        # Filter absolute state so that we only get the relative states for every game level
+        # that has a change of serve
+        initial_server = 0
+        filtered_absolute_state = [(cur_absolute_state[i],level_rules) for (i,level_rules) in levels_with_server_change]
+        server = reduce(self.calculate_server_for_level, filtered_absolute_state, initial_server)
+        win_p, los_p = (spw_a,1-spw_a) if server == 0 else (1-spw_b,spw_b)
+        return win_p, los_p
+
+    def calculate_server_for_level(self,cur_server, level):
+        state, rules =  level
+        if state[0] == 'adv':
+            server = 0 if state[1][1] == 'a' else 1 # Technical debt, change adv servers to numbers instead of letters
+        else:
+            s_a, s_b = state
+            number_of_serves = rules[4]
+            k = s_a + s_b
+            server = math.floor(k/number_of_serves) % self.NUM_OF_PLAYERS
+        return cur_server + server % self.NUM_OF_PLAYERS
+
+    # TODO: May need to introduce here the rule of 'change server at the end of every game'
+   # def calculate_win_and_lose_point_probabilities(self, cur_index, cur_server, isolated_level_states, abs_in_to_st):
+   #     cur_absolute_state = abs_in_to_st[cur_index]
+   #     levels_with_server_change = self.filter_game_levels_with_serving_rules()
+   #     # Filter absolute state so that we only get the relative states for every game level
+   #     # that has a change of serve
+   #     filtered_absolute_state = [(cur_absolute_state[i],level_rules) for (i,level_rules) in levels_with_server_change]
+   #     advantage_relative_states = [(rel_state, rules) for (rel_state, rules) in filtered_absolute_state if rel_state[0][0] == 'adv']
+   #     normal_relative_states    = [(rel_state, rules) for (rel_state, rules) in filtered_absolute_state if rel_state[0][0] != 'adv']
+
+   #     #advantage_states_change_of_server = [ c_s+1 == rules[3] for ((a,(adv,s,c_s),rules) in advantage_relative_states]
+   #     advantage_states_change_of_server = [False]
+
+   #     K = [s_a + s_b for ((s_a, s_b),rules) in normal_relative_states] # calculates K values for each game level.
+   #     normal_states_change_of_server    = []
+   #      
+   #     # Check if any level of the hierarchy needs to change server
+   #     server_needs_to_change = any(zip(advantage_states_change_of_server, normal_states_change_of_server))
+   #     server = cur_server
+
+   #     spw_a, spw_b = self.serve_win_probabilities
+   #     win_p, los_p = spw_a, spw_b
+   #     if server_needs_to_change:
+   #         server = 'b' if server == 'a' else 'a'
+   #     if server == 'a':
+   #         win_p = spw_a
+   #         los_p = 1 - spw_a
+   #     else:
+   #         win_p = 1 - spw_b
+   #         los_p = spw_b
+   #     server, win_p, los_p = cur_server, spw_a, spw_b
+   #     return server, win_p, los_p
+
+    # Calculates the aggreagated or total level size for all future game levels.
     def aggregated_level_size(self, x):
         return [reduce(lambda x,y: x*y, x[i:]) for i in range(0,len(x))] # What an obscure and beautiful line of code
 
+    # Calculates the isolated level size for all future game levels.
     def isolated_level_size(self):
         return map(lambda rules: self.calculate_number_of_states(*rules), self.level_rules)
+    
+    # Filters all the game levels in order to get only those that are affected
+    # by changing rules that change the server, their corresponding hierarchy level
+    # is also returned.
+    def filter_game_levels_with_serving_rules(self):
+        # rules[4] is number of serves. Should really make it a dictionary
+        return filter(lambda (i, rules): rules[4] is not None,
+                      [(index, rules) for (index,rules) in enumerate(self.level_rules)])
 
     '''
         Calculates number of states according to the 4 input parameters: Goal, Lead, Golden, Best_of
