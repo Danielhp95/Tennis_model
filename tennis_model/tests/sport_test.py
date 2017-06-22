@@ -317,7 +317,7 @@ class SportTest(unittest.TestCase):
         np.testing.assert_allclose(t_m, real_t_m, atol=1e-1)
 
     def test_transition_matrix_tiebreaker_serve(self):
-        s = sp.Sport()
+        s = sp.Sport(serve_win_probabilities=[0.7,0.6])
         # Needs to offset first serve by 1
         s.add_hierarchy_level(goal=3, lead=2, number_of_serves=2)
         t_m = s.compute_transition_matrix()

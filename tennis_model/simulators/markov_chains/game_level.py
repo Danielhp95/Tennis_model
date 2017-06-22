@@ -78,7 +78,6 @@ class GameLevel:
                 # Assume advantage for 0 is already there
                 for server in ['a','b']: # Am I doing less breadth-first and more sweeping?
                     for consecutive_serves in range(0, self.number_of_serves):
-                        #TODO: consider that goal**2 state will already have a value
                         state = ('adv', (advantage, server, consecutive_serves))
                         adv_index = adv_states.pop(0)
                         self.index_to_state[adv_index] = state
@@ -91,9 +90,9 @@ class GameLevel:
             # This is already covered in add lead indexes, this is advantage zero state
             return
         if outcome == 0:
-          # Check if state has already been populated
+            # Check if state has already been populated
             if state not in self.index_to_state.values():
-              # Available index will be reduced in size
+                # Available index will be reduced in size
                 next_index                             = available_indexes.pop(0) 
                 self.index_to_state[next_index]        = state
                 self.state_to_index[state]             = next_index
@@ -120,7 +119,7 @@ class GameLevel:
                 server  = players[server_index]
                 consecutive_serves = k % self.number_of_serves
             advantage_state = ('adv',(advantage,server,consecutive_serves))
-  
+
             # Check if we have already visited this state
             if advantage_state not in self.state_to_index:
                 next_index = available_indexes.pop(0)
@@ -183,3 +182,4 @@ class GameLevel:
 
         # Fifth check: match continues without special condition
         return 0
+

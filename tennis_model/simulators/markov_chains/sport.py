@@ -299,39 +299,6 @@ class Sport:
             server = math.floor(k/number_of_serves) % self.NUM_OF_PLAYERS
         return cur_server + server % self.NUM_OF_PLAYERS
 
-    # TODO: May need to introduce here the rule of 'change server at the end of every game'
-   # def calculate_win_and_lose_point_probabilities(self, cur_index, cur_server, isolated_level_states, abs_in_to_st):
-   #     cur_absolute_state = abs_in_to_st[cur_index]
-   #     levels_with_server_change = self.filter_game_levels_with_serving_rules()
-   #     # Filter absolute state so that we only get the relative states for every game level
-   #     # that has a change of serve
-   #     filtered_absolute_state = [(cur_absolute_state[i],level_rules) for (i,level_rules) in levels_with_server_change]
-   #     advantage_relative_states = [(rel_state, rules) for (rel_state, rules) in filtered_absolute_state if rel_state[0][0] == 'adv']
-   #     normal_relative_states    = [(rel_state, rules) for (rel_state, rules) in filtered_absolute_state if rel_state[0][0] != 'adv']
-
-   #     #advantage_states_change_of_server = [ c_s+1 == rules[3] for ((a,(adv,s,c_s),rules) in advantage_relative_states]
-   #     advantage_states_change_of_server = [False]
-
-   #     K = [s_a + s_b for ((s_a, s_b),rules) in normal_relative_states] # calculates K values for each game level.
-   #     normal_states_change_of_server    = []
-   #      
-   #     # Check if any level of the hierarchy needs to change server
-   #     server_needs_to_change = any(zip(advantage_states_change_of_server, normal_states_change_of_server))
-   #     server = cur_server
-
-   #     spw_a, spw_b = self.serve_win_probabilities
-   #     win_p, los_p = spw_a, spw_b
-   #     if server_needs_to_change:
-   #         server = 'b' if server == 'a' else 'a'
-   #     if server == 'a':
-   #         win_p = spw_a
-   #         los_p = 1 - spw_a
-   #     else:
-   #         win_p = 1 - spw_b
-   #         los_p = spw_b
-   #     server, win_p, los_p = cur_server, spw_a, spw_b
-   #     return server, win_p, los_p
-
     # Calculates the aggreagated or total level size for all future game levels.
     def aggregated_level_size(self, x):
         return [reduce(lambda x,y: x*y, x[i:]) for i in range(0,len(x))] # What an obscure and beautiful line of code
