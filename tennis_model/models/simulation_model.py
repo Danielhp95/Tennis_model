@@ -1,3 +1,4 @@
+from __future__ import division
 import tennis_model
 from tennis_model.simulators.tennis import tennis_match
 import pandas as pd
