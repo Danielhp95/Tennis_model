@@ -6,7 +6,7 @@ import math
 
 class SimulationModel(object):
 
-    def __init__(self, simulations=1000):
+    def __init__(self, simulations=5000):
         self.simulations = simulations
 
     def is_safe_datapoint(self, *vals):

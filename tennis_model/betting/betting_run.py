@@ -85,12 +85,7 @@ class BettingRun(object):
             filter_atp = betdao.filter_by_rank_points(filter_atp, rank_points)
             filter_wta = betdao.filter_by_rank_points(filter_wta, rank_points)
         if courts is not None:
-            print(len(filter_atp))
             filter_atp = atpdao.filter_by_court(filter_atp, courts)
-            print(len(filter_atp))
-            for i, r in filter_atp.iterrows():
-                assert r['Surface'] == 'Grass'
-                
             filter_wta = atpdao.filter_by_court(filter_wta, courts)
         return filter_atp, filter_wta
 
