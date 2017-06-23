@@ -68,8 +68,6 @@ class GameLevelTest(unittest.TestCase):
     # and all valid indexes are adjacent
     def test_calculate_states_from_indexes(self):
         g = gl.GameLevel(best_of=3)
-        g.wp = 1
-        g.lp = -1
         number_of_transient_states = 4
         valid_indexes = [0,6,12,18]
         real_st_to_in = {(0,0):0,(1,0):6,(0,1):12,(1,1):18}
@@ -80,8 +78,6 @@ class GameLevelTest(unittest.TestCase):
 
     def test_calculate_states_from_indexes_tiebreaker_serve(self):
         g = gl.GameLevel(goal=2,lead=2,number_of_serves=2)
-        g.wp = 1
-        g.lp = -1
         number_of_transient_states = 4
         valid_indexes = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
         real_st_to_in = {(0,0):0,
