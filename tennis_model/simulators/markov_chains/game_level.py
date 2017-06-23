@@ -7,8 +7,7 @@ class GameLevel:
 
 
     def __init__(self, goal=None, lead=1, golden=float("inf"), best_of=None, number_of_serves=None):
-        self.wp      = 9999  # will need to turn this into variables
-        self.lp      = -9999 # These are not used here
+        self.NUM_OF_PLAYERS = 2
         self.number_of_serves = number_of_serves
         self.goal    = goal
         self.best_of = best_of
@@ -46,8 +45,8 @@ class GameLevel:
             outcome_a = self.is_over((s_a + 1, s_b), self.goal, self.lead, self.golden, self.best_of)
             outcome_b = self.is_over((s_a    , s_b + 1), self.goal, self.lead, self.golden, self.best_of)
 
-            self.calculate_next_index(outcome_a, (s_a+1, s_b), i, available_indexes, self.wp)
-            self.calculate_next_index(outcome_b, (s_a, s_b+1), i, available_indexes, self.lp)
+            self.calculate_next_index(outcome_a, (s_a+1, s_b), i, available_indexes)
+            self.calculate_next_index(outcome_b, (s_a, s_b+1), i, available_indexes)
 
         return self.index_to_state, self.state_to_index
 
@@ -84,7 +83,7 @@ class GameLevel:
                         self.state_to_index[state]     = adv_index
         return valid_indexes
 
-    def calculate_next_index(self, outcome, state, cur_index, available_indexes, p):
+    def calculate_next_index(self, outcome, state, cur_index, available_indexes):
         # Case where the state (goal -1, goal-1) becomes a deuce state
         if self.number_of_serves is not None and self.lead > 1 and state == (self.goal-1, self.goal-1):
             # This is already covered in add lead indexes, this is advantage zero state
@@ -182,4 +181,19 @@ class GameLevel:
 
         # Fifth check: match continues without special condition
         return 0
+
+    """
+        Calculates the server and the number of consecutive serves by the server
+        given a state and the rules for a game level
+    """
+    @staticmethod
+    def calculate_server_and_consecutive_serve(state, serving_rules):
+        s_a, s_b = state
+        if s_a == 'adv':
+            pass
+        else:
+            k       = s_a + s_b # What point we are in the game level
+            server_index  = math.floor(k/self.number_of_serves) % self.NUM_OF_PLAYERS
+            server  = players[server_index]
+            consecutive_serves = k % self.number_of_serves
 
